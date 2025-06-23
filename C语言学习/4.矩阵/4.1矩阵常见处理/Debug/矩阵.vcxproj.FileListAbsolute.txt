@@ -1,0 +1,3 @@
+D:\C语言学习\矩阵\Debug\矩阵.exe
+D:\C语言学习\数组\矩阵\Debug\矩阵.exe
+D:\C语言学习\矩阵的常见处理\Debug\矩阵.exe

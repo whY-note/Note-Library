@@ -1,0 +1,2 @@
+D:\C语言学习\数组\Debug\数组.exe
+D:\C语言学习\字符数组\Debug\数组.exe

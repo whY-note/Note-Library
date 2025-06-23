@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34031.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "自增的相加", "自增的相加.vcxproj", "{83837BC7-F730-4724-A700-3ED3273C43C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Debug|x64.ActiveCfg = Debug|x64
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Debug|x64.Build.0 = Debug|x64
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Debug|x86.ActiveCfg = Debug|Win32
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Debug|x86.Build.0 = Debug|Win32
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Release|x64.ActiveCfg = Release|x64
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Release|x64.Build.0 = Release|x64
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Release|x86.ActiveCfg = Release|Win32
+		{83837BC7-F730-4724-A700-3ED3273C43C9}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD5422D5-329C-4A79-8A5C-172B9CC628CD}
+	EndGlobalSection
+EndGlobal
