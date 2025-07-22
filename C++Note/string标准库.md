@@ -16,6 +16,7 @@
 
 ```cpp
 string s1;        //默认初始化，创建一个空字符串
+string s="";      //利用空字符串字面值来赋值，也会创建一个空字符串
 
 string s2 = "ABC";//用"ABC"来初始化，拷贝初始化
 string s3("ABC"); //用"ABC"来初始化，直接初始化
@@ -147,6 +148,11 @@ cout << s7.capacity() << endl;// 保持不变
 ## 子串、比较、拷贝、交换：
 
 substr(int pos, int count)  返回子串对象
+
+参数含义：
+
+- pos：起始位置
+- count：子串长度
 
 
 
