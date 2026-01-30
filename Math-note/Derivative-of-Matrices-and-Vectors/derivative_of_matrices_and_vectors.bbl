@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax\else
+  \urlstyle{same}\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \DeclareUrlCommand\doi{\urlstyle{rm}}
+  \def\eprint#1#2{#2}
+\else
+  \def\doi#1{\href{https://doi.org/#1}{\nolinkurl{#1}}}
+  \let\eprint\href
+\fi
+
+\bibitem[王天威(2023)]{王天威2023控制之美}
+王天威.
+\newblock 控制之美: 最优化控制 MPC 与卡尔曼滤波器 Optimal control, model predictive control and Kalman filter. 卷 2\allowbreak[M].
+\newblock 清华大学出版社, 2023.
+
+\end{thebibliography}

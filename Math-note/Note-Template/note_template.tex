@@ -1,0 +1,248 @@
+%! Mode:: "TeX:UTF-8"
+%! TEX program = xelatex
+\PassOptionsToPackage{quiet}{xeCJK}
+\documentclass[withoutpreface,bwprint]{NoteBook}
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{tabular}{\zihao{-5}}
+\usepackage[numbers,sort&compress]{natbib}  % 文献管理宏包
+\usepackage[framemethod=TikZ]{mdframed}  % 框架宏包
+\usepackage{url}  % 网页链接宏包
+\usepackage{subcaption}  % 子图宏包
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\title{笔记模板}  % 论文标题
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 正文
+\begin{document}
+
+\maketitle
+\begin{abstract}
+摘要
+
+\textbf{对于问题一,}
+
+\textbf{对于问题二,}
+
+\textbf{对于问题三,}
+
+\textbf{对于问题四,}
+
+最后，
+
+\keywords{聚类分析\quad  关键词\quad  关键词\quad  关键词 \quad 关键词}
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% % 目录
+% \tableofcontents  % 目录
+% \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{符号说明}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{CLC} % 第二个{}内调整表格宽度，比如{0.8\textwidth}
+\toprule
+符号    & 说明    & 单位 \\
+\midrule
+$m     $& 质量 & $kg$ \\
+$V     $& 体积 & $m^3$ \\
+\bottomrule
+\end{tabularx}
+\label{tab:符号说明}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题一的模型的建立和求解}
+\subsection{模型建立}
+
+$$
+E = mc^2  % 没有编号
+$$
+
+引用公式\cref{eq:eq1}。
+
+\begin{equation}
+\label{eq:eq1}  % 公式的编号
+E = mc^2
+\end{equation}
+
+引用\cref{fig:单图}。
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{example.eps}
+\caption{单图}
+\label{fig:单图}
+\end{figure}
+
+这句话引用了文献\cite{司守奎2011数学建模算法与应用}。
+
+这句话引用了文献\upcite{卓金武2011MATLAB}。
+
+\subsection{模型求解}
+
+\textbf{Step1：} 
+
+\textbf{Step2：} 
+
+\textbf{Step3：} 
+
+\subsection{求解结果}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题二的模型的建立和求解}
+\subsection{模型建立}
+
+引用\cref{fig:双图}，引用\cref{fig:双图a}，引用\cref{fig:双图b}。
+
+\begin{figure}[ht]
+\centering
+\subcaptionbox{双图a子标题\label{fig:双图a}}
+{\includegraphics[width=.4\textwidth]{example.eps}}
+\subcaptionbox{双图b子标题\label{fig:双图b}}
+{\includegraphics[width=.4\textwidth]{example.eps}}
+\caption{双图}\label{fig:双图}
+\end{figure} 
+
+\subsection{模型求解}
+
+\textbf{Step1：} 
+
+\textbf{Step2：} 
+
+\textbf{Step3：} 
+
+\subsection{求解结果}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题三的模型的建立和求解}
+\subsection{模型建立}
+
+
+\subsection{模型求解}
+
+\textbf{Step1：} 
+
+\textbf{Step2：} 
+
+\textbf{Step3：} 
+
+\subsection{求解结果}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{问题四的模型的建立和求解}
+\subsection{模型建立}
+
+\subsection{模型求解}
+
+\textbf{Step1：} 
+
+\textbf{Step2：} 
+
+\textbf{Step3：} 
+
+\subsection{求解结果}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\section{图表的插入}
+切记：“上表下图”，即表格的标题在其上方，图的标题在其下方
+\subsection{表格的插入}
+
+表格应具有三线表格式，因此常用 booktabs宏包，其标准格式如\cref{tab:001}~所示。
+
+\begin{table}[!htbp]
+    \caption{标准三线表格}\label{tab:001} \centering
+    \begin{tabular}{cccccc} % 选择对齐方式：c:居中，l:左，r:右
+        \toprule[1.5pt] %表格最上面的线的线宽
+        $D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
+        \midrule[1pt] %表格最中间的线的线宽
+        5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
+        10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
+        20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
+        \bottomrule[1.5pt] %表格最下面的线的线宽
+    \end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{图的插入}
+
+先把图片导入到figures文件夹，然后再按照以下代码插入到论文中。
+插入的图片如 \cref{fig:circuit-diagram}~所示。
+
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.8\textwidth]{beautiful_sight} % 图片的文件名，不用加后缀！
+    \caption{风景图}
+    \label{fig:circuit-diagram}
+\end{figure}
+
+代码解释：
+
+[!h] 是 位置参数，告诉 LaTeX 希望图片放在哪：
+\begin{itemize}[itemindent=2em]
+\item h (here)：尽量放在当前位置。
+
+\item t (top)：放在页面顶部。
+
+\item b (bottom)：放在页面底部。
+
+\item p (page of floats)：单独放在一个只包含浮动体的页面。
+
+\item ! (override)：忽略 LaTeX 的部分限制，更强制地按照指定位置放。
+
+\end{itemize}
+
+[!h] 就是強烈要求放在目前位置。
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 参考文献
+\nocite{*}
+\bibliographystyle{gbt7714-numerical}  % 引用格式
+\bibliography{ref.bib}  % bib源
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 附录
+\begin{appendices}
+\section{文件列表}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{LL}
+\toprule
+文件名   & 功能描述 \\
+\midrule
+q1.m & 问题一程序代码 \\
+q2.py & 问题二程序代码 \\
+q3.c & 问题三程序代码 \\
+q4.cpp & 问题四程序代码 \\
+\bottomrule
+\end{tabularx}
+\label{tab:文件列表}
+\end{table}
+
+\section{代码}
+\noindent q1.m
+\lstinputlisting[language=matlab]{code/q1.m}
+q2.py
+\lstinputlisting[language=python]{code/q2.py}
+q3.c
+\lstinputlisting[language=c]{code/q3.c}
+q4.cpp
+\lstinputlisting[language=c++]{code/q4.cpp}
+\end{appendices}
+\end{document}
+
+

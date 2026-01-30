@@ -1,0 +1,21 @@
+\contentsline {section}{\numberline {1}一般形式的离散有限时间LQR问题}{2}{section.1}%
+\contentsline {section}{\numberline {2}动态规划法求解}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}具体推导}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}算法流程}{6}{subsection.2.2}%
+\contentsline {section}{\numberline {3}转化为QP问题求解}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}目标函数的大矩阵形式}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}状态空间方程的大矩阵形式}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}最优控制量的求解}{8}{subsection.3.3}%
+\contentsline {section}{\numberline {4}KKT条件求解LQR问题}{9}{section.4}%
+\contentsline {subsection}{\numberline {4.1}KKT条件}{10}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}最优控制量与Riccati方程的推导}{11}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}总结}{14}{subsection.4.3}%
+\contentsline {section}{\numberline {5}块KKT系统求解LQR问题}{15}{section.5}%
+\contentsline {subsection}{\numberline {5.1}目标函数的大矩阵形式}{15}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}约束条件的大矩阵形式}{17}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}LQR问题的大矩阵形式}{17}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}块KKT条件}{18}{subsection.5.4}%
+\contentsline {section}{\numberline {6}图表的插入}{20}{section.6}%
+\contentsline {subsection}{\numberline {6.1}表格的插入}{20}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}图的插入}{21}{subsection.6.2}%
+\contentsfinish 

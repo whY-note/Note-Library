@@ -1,0 +1,1371 @@
+# LQR
+
+## 一般形式的离散有限时间LQR问题
+
+假设状态变量为$x_k \in \mathbb{R}^n,k=0,1,\cdots,N$，控制变量为$u_k \in \mathbb{R}^p,k=0,1,\cdots,N-1$,
+
+目标函数（含有$x,u$的线性项和$x,u$的交叉项）
+$$
+\begin{equation}
+\label{eq:J}
+J=\sum_{k=0}^{N-1}{l_k\left( x_k,u_k \right)}+l_N\left( x_N \right) 
+\end{equation}
+$$
+其中，
+$$
+\begin{equation}
+\label{eq:l_k}
+l_k\left( x,u \right) =\frac{1}{2}x^\mathrm{T} Q_k x  + x^\mathrm{T} S_k u + \frac{1}{2}u^\mathrm{T} R_k u + x^\mathrm{T}q_k + u^\mathrm{T} r_k
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:l_N}
+l_N\left( x \right) =\frac{1}{2}x^\mathrm{T} Q_N x + x^\mathrm{T}q_N 
+\end{equation}
+$$
+
+$$
+Q_k \succeq 0 & \text{positive semi-define} \quad (k=1,\cdots,N) \\
+R_k \succ 0 &  \text{positive define} \quad  (k=1,\cdots,N-1)
+$$
+
+离散的状态空间方程（含有常数项）
+$$
+\begin{equation}
+\label{eq:state_space_equatoin}
+x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+那么一般形式的离散有限时间LQR问题可以表达为
+$$
+\begin{equation}
+\begin{aligned}
+\label{eq:general_discrete_finite_time_LQR_problem}
+J=&\sum_{k=0}^{N-1}{l_k\left( x_k,u_k \right)}+l_N\left( x_N \right) \\
+s.t.\quad& x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+\end{aligned}
+\end{equation}
+$$
+
+目标函数$\eqref{eq:J}$​可以展开为
+$$
+\begin{equation}
+\label{eq:J_detail}
+J = \sum_{k=0}^{N-1} \left( \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k \right) 
++ \frac{1}{2}x_N^\mathrm{T} Q_N x_N + x_N^\mathrm{T}q_N
+\end{equation}
+$$
+一般形式的离散有限时间LQR问题可以展开写为
+$$
+\begin{equation}
+\label{eq:general_discrete_finite_time_LQR_problem_detail}
+\begin{aligned}
+J=& \sum_{k=0}^{N-1} \left( \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k \right) 
++ \frac{1}{2}x_N^\mathrm{T} Q_N x_N + x_N^\mathrm{T}q_N\\
+s.t.\quad & x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+\end{aligned}
+\end{equation}
+$$
+
+
+## 动态规划法求解
+
+### 具体推导
+
+首先定义值函数
+$$
+\begin{equation}
+\label{eq:Value_func}
+V_k\left(x \right) = \frac{1}{2}x^\mathrm{T} P_k x + x^\mathrm{T}p_k + c_k
+\end{equation}
+$$
+下面利用动态规划法从后向前求解
+
+对于最后一步，目标函数$\eqref{eq:J}$就是
+$$
+\begin{equation}
+\label{eq:J_N_to_N}
+J_{N\rightarrow N}=l_N\left( x_N \right) = \frac{1}{2}x_{N}^\mathrm{T} Q_{N} x_{N} + x_{N}^\mathrm{T}q_{N} 
+\end{equation}
+$$
+这时，目标函数中不含有$u$，因此$l_N\left( x_N \right)$就是这时的最小代价。
+
+所以值函数$V_N(x_N)$为
+$$
+V_N(x_N)= l_N\left( x_N \right)
+$$
+对比$\eqref{eq:l_N}$和$\eqref{eq:Value_func}$，可知值函数$V_N(x_N)$的系数分别为
+$$
+\begin{equation}
+\label{eq:V_N_params}
+P_N = Q_N, \quad p_N=q_N, \quad c_N = 0
+\end{equation}
+$$
+对于第$k$步到第$k+1$步，假设第$k+1$步的值函数$V_{k+1}(x)$已经求出，那么第$k$步到第$k+1$步的目标函数为
+$$
+\begin{align}
+\label{eq:J_k_to_k_plus_1}
+J_{k\rightarrow k+1}
+=& l_k\left( x_k \right)+ V_{k+1}(x_{k+1}) \nonumber \\
+
+=& l_k\left( x_k \right)+ V_{k+1}(A_k x_{k}+B_k u_{k} + b_k) \nonumber \\
+
+=& \left( \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k \right) \nonumber \\
+ & + \left[\frac{1}{2}(A_k x_{k}+B_k u_{k}+ b_k)^\mathrm{T} P_{k+1} (A_k x_{k}+B_k u_{k} + b_k) 
++ (A_k x_{k}+B_k u_{k} + b_k)^\mathrm{T}p_{k+1}
++ c_{k+1}\right] \nonumber \\
+
+=& \frac{1}{2}x_k^\mathrm{T} (Q_k + A_k^\mathrm{T}P_{k+1}A_k) x_k
++ x_k^\mathrm{T}(S_k + A_k^\mathrm{T}P_{k+1}B_k) u_k 
++ \frac{1}{2}u_k^\mathrm{T} (R_k + B_k^\mathrm{T}P_{k+1}B_k) u_k \nonumber \\
+ & + x_k^\mathrm{T}\left( q_k + A_k^\mathrm{T}P_{k+1}b_k+ A_k^\mathrm{T} p_{k+1} \right)
+ + u_k^\mathrm{T}\left( r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} + B_{k}^\mathrm{T}p_{k+1} \right)
+ + const
+\end{align}
+$$
+记
+$$
+\begin{align}
+\label{eq:tilde_Q_in_J_k_to_k_plus_1}
+\tilde{Q}_k =& Q_k + A_k^\mathrm{T}P_{k+1}A_k  \\
+
+\label{eq:tilde_S_in_J_k_to_k_plus_1} 
+\tilde{S}_k =& S_k + A_k^\mathrm{T}P_{k+1}B_k \\
+
+\label{eq:tilde_R_in_J_k_to_k_plus_1}
+\tilde{R}_k =& R_k + B_k^\mathrm{T}P_{k+1}B_k \\
+
+\label{eq:tilde_q_in_J_k_to_k_plus_1}
+\tilde{q}_k =& q_k + A_k^\mathrm{T}P_{k+1}b_k+ A_k^\mathrm{T} p_{k+1} \\
+
+\label{eq:tilde_r_in_J_k_to_k_plus_1}
+\tilde{r}_k =& r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} + B_{k}^\mathrm{T}p_{k+1} 
+\end{align}
+$$
+将$\eqref{eq:tilde_Q_in_J_k_to_k_plus_1} \sim \eqref{eq:tilde_r_in_J_k_to_k_plus_1}$代入 $\eqref{eq:J_k_to_k_plus_1}$，得到
+$$
+\begin{equation}
+\label{eq:J_k_to_k+1_simple}
+J_{k\rightarrow k+1}
+= \frac{1}{2}x_k^\mathrm{T} \tilde{Q}_k x_k
++ x_k^\mathrm{T} \tilde{S}_k u_k 
++ \frac{1}{2}u_k^\mathrm{T} \tilde{R}_k u_k 
++ x_k^\mathrm{T} \tilde{q}_k 
++ u_k^\mathrm{T} \tilde{r}_k 
++ const
+\end{equation}
+$$
+极小化目标函数
+$$
+\min_u J_{k\rightarrow k+1}
+$$
+考虑到目标函数是个连续可微的凸函数，因此对$u_k$求偏导数，并令其为0
+$$
+\frac{\partial J_{k\rightarrow k+1}}{\partial u_k} = 0
+$$
+得到
+$$
+\begin{equation}
+\label{eq:partial_u_k_for_J_k_to_k_plus_1}
+\tilde{R}_k u_k
++ \tilde{S}_k^\mathrm{T} x_k 
++ \tilde{r}_k 
+=0
+\end{equation}
+$$
+移项得到最优控制
+$$
+\begin{equation}
+\label{eq:u_k_simple}
+u_k^* = - \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} x_k 
+- \tilde{R}_k^{-1} \tilde{r}_k 
+\end{equation}
+$$
+将$\eqref{eq:tilde_S_in_J_k_to_k_plus_1},\eqref{eq:tilde_R_in_J_k_to_k_plus_1},\eqref{eq:tilde_r_in_J_k_to_k_plus_1}$ 代入 $\eqref{eq:u_k_simple}$,得到
+$$
+\begin{align}
+\label{eq:u_k_star}
+u_k^*
+=& - \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right)^\mathrm{T} x_k \nonumber \\
+ & - \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left(r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} +B_{k}^\mathrm{T}p_{k+1} \right)  \nonumber \\
+ 
+ =& - \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left( S_k^\mathrm{T} + B_k^\mathrm{T}P_{k+1}A_k \right) x_k \nonumber \\
+ & - \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left(r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} 
++ B_{k}^\mathrm{T}p_{k+1} \right)
+\end{align}
+$$
+
+记
+$$
+\begin{align}
+\label{eq:K_k_define} 
+{K}_k =& \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left( S_k^\mathrm{T} + B_k^\mathrm{T}P_{k+1}A_k \right) \\
+
+\label{eq:d_k_define} 
+d_k =& \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left(r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} 
++ B_{k}^\mathrm{T}p_{k+1} \right) \\
+\end{align}
+$$
+那么$\eqref{eq:u_k_star}$可以写为标准形式
+$$
+\begin{equation}
+\label{eq:u_k_normal_type}
+u_k^*
+= - K_k x_k 
+- d_k 
+\end{equation}
+$$
+将$\eqref{eq:u_k_simple}$代入回$\eqref{eq:J_k_to_k+1_simple}$,得
+$$
+\begin{align}
+\label{eq:J_k_to_k_plus_1_only_has_x_k}
+J_{k\rightarrow k+1}
+=& \frac{1}{2}x_k^\mathrm{T} \tilde{Q}_k x_k
++ x_k^\mathrm{T} \tilde{S}_k \left( - \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} x_k 
+- \tilde{R}_k^{-1} \tilde{r}_k \right)
++ \frac{1}{2} \left( - \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} x_k 
+- \tilde{R}_k^{-1} \tilde{r}_k \right)^\mathrm{T} \tilde{R}_k \left( - \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} x_k 
+- \tilde{R}_k^{-1} \tilde{r}_k \right) \nonumber \\
+&+ x_k^\mathrm{T} \tilde{q}_k 
++ \left( - \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} x_k - \tilde{R}_k^{-1} \tilde{r}_k \right)^\mathrm{T} \tilde{r}_k 
++ const \nonumber \\
+
+=& \frac{1}{2}x_k^\mathrm{T}\left( \tilde{Q}_k - \tilde{S}_k \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T} \right) x_k 
++ x_k^\mathrm{T} \left( \tilde{q}_k - \tilde{S}_k \tilde{R}_k^{-1}\tilde{r}_k \right)
++ const
+\end{align}
+$$
+对比值函数$\eqref{eq:Value_func}$ 与 $\eqref{eq:J_k_to_k_plus_1_only_has_x_k}$，可知
+$$
+\begin{align}
+\label{eq:P_k}
+P_k =& \tilde{Q}_k - \tilde{S}_k \tilde{R}_k^{-1} \tilde{S}_k^\mathrm{T}  \\
+
+\label{eq:p_k}
+p_k =& \tilde{q}_k - \tilde{S}_k \tilde{R}_k^{-1}\tilde{r}_k
+\end{align}
+$$
+将$\eqref{eq:tilde_S_in_J_k_to_k_plus_1},\eqref{eq:tilde_R_in_J_k_to_k_plus_1},\eqref{eq:tilde_r_in_J_k_to_k_plus_1}$ 代入$\eqref{eq:P_k}$和 $\eqref{eq:p_k}$,得到对$\forall k \in \{ 0,1,\cdots,N-1\}$，有
+$$
+\begin{align}
+\label{eq:P_k_detail}
+P_k 
+=& Q_k 
++ A_k^\mathrm{T}P_{k+1}A_k 
+- \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right) \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right)^\mathrm{T} \\
+
+\label{eq:p_k_detail}
+p_k
+=& q_k 
++ A_k^\mathrm{T} P_{k+1}b_k
++ A_k^\mathrm{T} p_{k+1}
+- \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right) \left(R_k + B_k^\mathrm{T}P_{k+1}B_k \right)^{-1} \left( r_k + B_{k}^\mathrm{T}P_{k+1}b_{k} B_{k}^\mathrm{T}p_{k+1} \right)
+\end{align}
+$$
+
+将$\eqref{eq:K_k_define},\eqref{eq:d_k_define}$代入$\eqref{eq:P_k_detail},\eqref{eq:p_k_detail}$,可得更加简洁的形式
+$$
+\begin{align}
+\label{eq:P_k_with_K_k}
+P_k 
+=& Q_k 
++ A_k^\mathrm{T}P_{k+1}A_k 
+- \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right) K_k \\
+
+\label{eq:p_k_with_d_k}
+p_k
+=& q_k 
++ A_k^\mathrm{T}P_{k+1}b_k
++ A_k^\mathrm{T} p_{k+1}
+- \left( S_k + A_k^\mathrm{T}P_{k+1}B_k \right) d_k
+\end{align}
+$$
+由此，第$k$步的值函数$V_{k}(x)$​已经求出
+$$
+\begin{equation}
+\label{eq:Value_func_k}
+V_{k}(x) = \frac{1}{2}x^\mathrm{T} P_k x + x^\mathrm{T}p_k + const
+\end{equation}
+$$
+
+> 注意：由于$c_k$其实在求解过程中不需要用到，因此没有求出其显示表达式，只是用const代替
+
+然后，进入第$k-1$步到第$k$步的求解，直至求解到第$0$步。
+
+
+
+### 算法流程
+
+给定$A_k,B_k,b_k,R_k,S_k,r_k (k=1,\cdots,N-1)$和 $Q_k,q_k (k=1,\cdots,N)$​
+
+初始化 $P_N=Q_N,p_N = q_N$​
+
+反向从$k=N-1$到$0$递推：
+
+1. 计算$H_k$
+2. 计算$K_k,d_k$，见$\eqref{eq:K_k_define} $,$\eqref{eq:d_k_define} $
+3. 计算$P_k,p_k$，见$\eqref{eq:P_k_detail}$,$\eqref{eq:p_k_detail}$
+
+正向计算控制律：
+$$
+u_k^*= - K_k x_k - d_k 
+$$
+
+------
+
+
+
+## 转化为QP问题求解
+
+将原来的状态变量为$x_k \in \mathbb{R}^n,k=0,1,\cdots,N$，控制变量为$u_k \in \mathbb{R}^p,k=0,1,\cdots,N-1$分别写成大向量的形式
+$$
+\begin{equation}
+\label{eq:big_X_U_define}
+X = \begin{bmatrix}
+x_0 \\ x_1 \\ \vdots \\ x_{N-1} \\ x_N
+\end{bmatrix} \in \mathbb{R}^{(N+1) n \times 1} 
+,\quad
+U = \begin{bmatrix}
+u_0 \\ u_1 \\ \vdots \\ u_{N-1}
+\end{bmatrix} \in \mathbb{R}^{N p \times 1} 
+\end{equation}
+$$
+### 目标函数的大矩阵形式
+
+记
+$$
+\begin{equation}
+\label{eq:big_Q_define}
+\tilde{Q} = \begin{bmatrix}
+Q_0 & & & & \\
+& Q_1 & & & \\
+& & \ddots &&  \\
+& & & Q_{N-1} & \\
+& & & &  Q_N
+\end{bmatrix} \succeq 0 
+,\quad \tilde{Q} \in \mathbb{R}^{(N+1) n \times (N+1) n}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_R_define}
+\tilde{R} = \begin{bmatrix}
+R_0 & & & \\
+& R_1 & &  \\
+& & \ddots &  \\
+& & & R_{N-1} 
+\end{bmatrix} \succ 0 
+,\quad \tilde{R} \in \mathbb{R}^{N p \times N p}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_S_define}
+\tilde{S} = \begin{bmatrix}
+S_0 & & & \\
+& S_1 & &  \\
+& & \ddots &  \\
+& & & S_{N-1} \\
+0 & 0 & \cdots & 0 & 
+\end{bmatrix}
+,\quad \tilde{S} \in \mathbb{R}^{(N+1) n \times N p}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_q_define}
+\tilde{q} = \begin{bmatrix}
+q_0\\
+q_1 \\
+\vdots \\
+q_{N-1} \\
+q_{N}
+\end{bmatrix}
+,\quad \tilde{q} \in \mathbb{R}^{(N+1) n \times 1}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_r_define}
+\tilde{r} = \begin{bmatrix}
+r_0\\
+r_1 \\
+\vdots \\
+r_{N-1} \\
+\end{bmatrix}
+,\quad \tilde{r} \in \mathbb{R}^{N p \times 1}
+\end{equation}
+$$
+
+利用$\eqref{eq:big_X_U_define}$,$\eqref{eq:big_Q_define}$~$\eqref{eq:big_r_define}$，可以将目标函数$\eqref{eq:J_detail}$改写为
+$$
+\begin{equation}
+\label{eq:J_big_matrix}
+J = \frac{1}{2} X^\mathrm{T}\tilde{Q}X + X^\mathrm{T}\tilde{S} U + \frac{1}{2} U^\mathrm{T}\tilde{R}U + X^\mathrm{T}\tilde{q} + U^\mathrm{T}\tilde{r}
+\end{equation}
+$$
+
+### 状态空间方程的大矩阵形式
+
+根据状态空间方程$\eqref{eq:state_space_equatoin}$:
+$$
+x_{k+1} = A_k x_k + B_k u_k + b_k
+$$
+可以从$x_0$递推到$x_1,x_2,\cdots,x_N$​
+$$
+\begin{align}
+\label{eq:x_0}
+x_0 =& I x_0 \\
+
+\label{eq:x_1}
+x_{1} =& A_0 x_0 + B_0 u_0 + b_0 \\
+
+\label{eq:x_2}
+x_{2} =& A_{1} x_{1} + B_{1} u_{1} + b_{1} \nonumber \\
+=& A_{1} A_0 x_0 + A_{1} B_0 u_0 + B_{1} u_{1} + A_{1}b_0 + b_{1} \\
+
+\label{eq:x_3}
+x_{3} =& A_{2} x_{2} + B_{2} u_{2} + b_{2} \nonumber \\
+=& A_{2} A_{1} A_0 x_0 + A_{2} A_{1} B_0 u_0 + A_{2} B_{1} u_{1} +B_{2} u_{2} + A_{2}A_{1}b_0 + A_{2} b_{1}+ b_{2} \\
+\vdots & \nonumber \\
+
+\label{eq:x_N}
+x_{N} =& \left(\prod_{i=0}^{N-1} A_i \right) x_0 + \sum_{i=0}^{N-1} \left(\prod_{j=i+1}^{N-1} A_j \right) B_i u_i + \sum_{i=0}^{N-1} \left(\prod_{j=i+1}^{N-1} A_j \right) b_i
+
+\end{align}
+$$
+
+> [!NOTE]
+>
+> 注意：第一条式子$x_0 = I x_0$是为了凑大矩阵，便于后面交叉项的计算而加入的。下面就会看到它的妙用。
+
+记
+$$
+\begin{equation}
+\label{eq:big_A_define}
+\tilde{A} = \begin{bmatrix}
+I \\ A_0 \\ A_1 A_0 \\ A_2 A_1 A_0 \\ \vdots \\ \prod_{i=0}^{N-1} A_i
+\end{bmatrix} 
+,\quad  \tilde{A} \in \mathbb{R}^{(N+1) n \times n}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_B_define}
+\tilde{B} =  \begin{bmatrix}
+0 & 0 & 0 & \cdots & 0 \\
+B_0 & 0 & 0 & \cdots & 0 \\
+A_1 B_0 & B_1 & 0 & \cdots & 0 \\
+A_2 A_1 B_0 & A_2 B_1 & B_2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+(A_{N-1}\cdots A_1)B_0 & (A_{N-1}\cdots A_2)B_1 & (A_{N-1}\cdots A_3)B_2 & \cdots & B_{N-1} 
+\end{bmatrix} 
+,\quad  \tilde{B} \in \mathbb{R}^{(N+1) n \times Np}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:big_b_define}
+\tilde{b} =  \begin{bmatrix}
+0 \\
+b_0 \\
+A_1 b_0+b_1 \\
+A_2 A_1 b_0 + A_2 b_1 + b_2 \\
+\vdots \\
+(A_{N-1} \cdots A_1) b_0 + (A_{N-1} \cdots A_2) b_1 + \cdots+b_{N-1} 
+\end{bmatrix} 
+,\quad  \tilde{b} \in \mathbb{R}^{(N+1) n \times 1}
+\end{equation}
+$$
+
+利用$\eqref{eq:big_X_U_define},\eqref{eq:big_A_define},\eqref{eq:big_B_define},\eqref{eq:big_b_define}$，可以将从$x_0$递推到$x_1,x_2,\cdots,x_N$的公式$\eqref{eq:x_0}$ ~ $\eqref{eq:x_N}$​写成大矩阵形式
+$$
+\begin{equation}
+\label{eq:state_space_equation_big_matrix_type}
+X = \tilde{A}x_0 + \tilde{B}U+\tilde{b}
+\end{equation}
+$$
+
+### 最优控制量的求解
+
+在实际问题中，$x_0$是已知的初始状态，而$x_1,\cdots,x_N$都是未知的，故$X$是未知。所以将$\eqref{eq:state_space_equation_big_matrix_type}$代入目标函数$\eqref{eq:J_big_matrix}$,可以消去未知的$X$，只剩下未知数$U$
+$$
+\begin{align}
+\label{eq:J_big_matrix_type_remove_X}
+J =& \frac{1}{2} \left( \tilde{A}x_0 + \tilde{B}U+\tilde{b} \right)^\mathrm{T}\tilde{Q}\left( \tilde{A}x_0 + \tilde{B}U+\tilde{b} \right)
++ \left( \tilde{A}x_0 + \tilde{B}U+\tilde{b} \right)^\mathrm{T}\tilde{S} U 
++ \frac{1}{2} U^\mathrm{T}\tilde{R}U \nonumber \\
+& + \left( \tilde{A}x_0 + \tilde{B}U+\tilde{b} \right)^\mathrm{T}\tilde{q} 
++ U^\mathrm{T}\tilde{r} \nonumber \\
+
+=& \frac{1}{2} U^\mathrm{T} \left(\tilde{R}+\tilde{B}^\mathrm{T}\tilde{Q}\tilde{B} + \tilde{B}^\mathrm{T}\tilde{S} + \tilde{S}^\mathrm{T}\tilde{B} \right) U 
++ U^\mathrm{T} \left[ \tilde{B}^\mathrm{T}\tilde{Q} \left(\tilde{A}x_0 +\tilde{b} \right)+ \tilde{B}^\mathrm{T}\tilde{q} + \tilde{r} + \tilde{S}^\mathrm{T} \left(\tilde{A}x_0 +\tilde{b} \right) \right] \nonumber \\
+&+ \frac{1}{2} \left(\tilde{A}x_0 +\tilde{b} \right)^\mathrm{T} \tilde{Q} \left(\tilde{A}x_0 +\tilde{b} \right) 
++ \left(\tilde{A}x_0 +\tilde{b} \right)^\mathrm{T}\tilde{q}
+\end{align}
+$$
+记
+$$
+\begin{equation}
+\label{eq:H_in_J}
+H = \tilde{R}+\tilde{B}^\mathrm{T}\tilde{Q}\tilde{B} + \tilde{B}^\mathrm{T}\tilde{S} + \tilde{S}^\mathrm{T}\tilde{B} 
+\end{equation}
+$$
+
+$$
+\begin{align}
+\label{eq:g_in_J}
+g =& \tilde{B}^\mathrm{T}\tilde{Q} \left(\tilde{A}x_0 +\tilde{b} \right)
++ \tilde{B}^\mathrm{T}\tilde{q} 
++ \tilde{r} 
++ \tilde{S}^\mathrm{T} \left(\tilde{A}x_0 +\tilde{b} \right) \nonumber \\
+
+=& \left( \tilde{B}^\mathrm{T}\tilde{Q} + \tilde{S}^\mathrm{T} \right) \tilde{A} x_0 
++ \left( \tilde{B}^\mathrm{T}\tilde{Q} + \tilde{S}^\mathrm{T} \right) \tilde{b} 
++\tilde{B}^\mathrm{T}\tilde{q} 
++ \tilde{r} 
+\end{align}
+$$
+
+代入$\eqref{eq:J_big_matrix_type_remove_X}$，得到
+$$
+J=\frac{1}{2} U^\mathrm{T} H U 
++ U^\mathrm{T} g
++ const
+$$
+对$U$求偏导，并令其为0
+$$
+\frac{\partial J}{\partial U} = 0
+$$
+即
+$$
+H U + g = 0
+$$
+由于$\tilde{R} \succ 0, \tilde{Q} \succeq 0$，所以$H \succ 0$，说明$H$可逆。所以可以求出$U$为
+$$
+U= -H^{-1}g
+$$
+$u_0^*$即为$U$的第一项
+$$
+u_0^* = \begin{bmatrix}1 & 0 & \cdots & 0 \end{bmatrix}U
+$$
+
+------
+
+
+
+## KKT条件求解
+
+对于一般形式的LQR问题$\eqref{eq:general_discrete_finite_time_LQR_problem_detail}$(为了方便查阅，将它在此处再写一次)
+$$
+J= \sum_{k=0}^{N-1} \left( \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k \right) 
++ \frac{1}{2}x_N^\mathrm{T} Q_N x_N + x_N^\mathrm{T}q_N\\
+
+s.t.\quad  x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+$$
+### KKT条件
+
+通过引入拉格朗日乘子$\lambda_k \in \mathbb{R}^n,\quad k=1,2,\cdots,N$，写出其拉格朗日函数
+$$
+\begin{equation}
+\label{eq:Lagrange_func_of_J}
+\begin{aligned}
+L(x,u,\lambda) = &
+ \sum_{k=0}^{N-1} \left[ \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k + \lambda_{k+1}^\mathrm{T} \left( A_k x_k + B_k u_k + b_k - x_{k+1} \right) \right]\\
+& + \frac{1}{2}x_N^\mathrm{T} Q_N x_N + x_N^\mathrm{T}q_N
+\end{aligned}
+\end{equation}
+$$
+对$u_k$求偏导$k=0,1,\cdots,N-1$，并令其为0
+$$
+\frac{\partial L(x,u,\lambda)}{\partial u_k} = 0
+$$
+即
+$$
+S_k^\mathrm{T}x_k + R_k u_k + r_k + B_k^\mathrm{T}\lambda_{k+1}=0
+$$
+移项得
+$$
+\begin{equation}
+\label{eq:KKT_u_k}
+u_k = -R_k^{-1}S_k^\mathrm{T}x_k - R_k^{-1}\left( r_k + B_k^\mathrm{T}\lambda_{k+1} \right)
+\end{equation}
+$$
+对$x_k$求偏导$k=0,1,\cdots,N-1$，并令其为0
+$$
+\frac{\partial L(x,u,\lambda)}{\partial x_k} = 0
+$$
+即
+$$
+Q_k x_k + S_k u_k +q_k + A_k^\mathrm{T}\lambda_{k+1}-\lambda_{k}=0
+$$
+移项得
+$$
+\begin{equation}
+\label{eq:KKT_lambda_k}
+\lambda_{k}=Q_k x_k + S_k u_k +q_k + A_k^\mathrm{T}\lambda_{k+1}
+\end{equation}
+$$
+对$x_N$​求偏导，并令其为0
+$$
+\frac{\partial L(x,u,\lambda)}{\partial x_N} = 0
+$$
+即
+$$
+Q_N x_N+ q_N -\lambda_N =0
+$$
+移项得
+$$
+\begin{equation}
+\label{eq:KKT_lambda_N}
+\lambda_N =Q_N x_N+ q_N
+\end{equation}
+$$
+$\eqref{eq:KKT_lambda_k}$和$\eqref{eq:KKT_lambda_N}$称为协态方程，其中$\eqref{eq:KKT_lambda_N}$是协态方程的终止条件。
+
+
+
+综上，可以得到KKT条件
+
+> KKT条件由状态空间方程，协态方程，和控制最优性条件构成。
+>
+> The KKT conditions lead to the state space equation, the costate equation, and the optimality condition.
+
+$$
+\begin{align}
+\text{Primal feasible:}& \quad
+x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1\\
+
+\text{Dual feasible:}& \quad \text{not exists} \nonumber \\
+
+\text{Complementarity:}& \quad \text{not exists} \nonumber \\
+
+\text{Stationarity:}& \quad
+\begin{cases}
+u_k = -R_k^{-1}S_k^\mathrm{T}x_k - R_k^{-1}\left( r_k + B_k^\mathrm{T}\lambda_{k+1} \right),
+\quad k=0,1,\cdots,N-1\\
+
+\lambda_{k}=Q_k x_k + S_k u_k +q_k + A_k^\mathrm{T}\lambda_{k+1}, \quad k=0,1,\cdots,N-1 \\
+
+\lambda_N =Q_N x_N+ q_N.
+\end{cases}
+\end{align}
+$$
+
+### 最优控制量与Riccati方程的推导
+
+​	不难发现，KKT条件中全部都是等式，因此求解$u_k\quad(k=0,1,\cdots,N-1)$就相当于解方程，可以直接利用消元法求解。
+
+​	当$k=N-1$时，$\eqref{eq:KKT_u_k}$就是
+$$
+u_{N-1} = -R_{N-1}^{-1}S_{N-1}^\mathrm{T}x_{N-1} - R_{N-1}^{-1}\left( r_{N-1} + B_{N-1}^\mathrm{T}\lambda_{N} \right)
+$$
+代入$\eqref{eq:KKT_lambda_N}$的$\lambda_N$ ,得
+$$
+u_{N-1} = -R_{N-1}^{-1}S_{N-1}^\mathrm{T}x_{N-1} - R_{N-1}^{-1}\left[ r_{N-1} + B_{N-1}^\mathrm{T} \left(Q_N x_N+ q_N \right) \right]
+$$
+代入$k=N-1$时的状态空间方程
+$$
+x_N = A_{N-1}x_{N-1}+ B_{N-1}u_{N-1}+b_{N-1}
+$$
+得到
+$$
+\begin{equation}
+\label{eq:KKT_u_N_minus_1_substitute_lambda_N_and_x_N}
+u_{N-1} = -R_{N-1}^{-1}S_{N-1}^\mathrm{T}x_{N-1} - R_{N-1}^{-1} \{ r_{N-1} + B_{N-1}^\mathrm{T} \left[ Q_N \left( A_{N-1}x_{N-1}+ B_{N-1}u_{N-1}+b_{N-1} \right) + q_N \right] \}
+\end{equation}
+$$
+整理得
+$$
+\begin{equation}
+\label{eq:KKT_u_N_minus_1_detail}
+\begin{aligned}
+u_{N-1} = &
+-\left( R_{N-1}+B_{N-1}^\mathrm{T}Q_N B_{N-1} \right)^{-1} \left( S_{N-1}^\mathrm{T} + B_{N-1}^\mathrm{T} Q_N A_{N-1} \right) x_{N-1} \\
+& - \left( R_{N-1}+B_{N-1}^\mathrm{T}Q_N B_{N-1} \right)^{-1} \left( r_{N-1}+ B_{N-1}^\mathrm{T} Q_N b_{N-1}+B_{N-1}^\mathrm{T} Q_N \right)
+\end{aligned}
+\end{equation}
+$$
+记
+$$
+\begin{equation}
+\label{eq:KKT_K_N_minus_1}
+K_{N-1} = \left( R_{N-1}+B_{N-1}^\mathrm{T}Q_N B_{N-1} \right)^{-1} \left( S_{N-1}^\mathrm{T} + B_{N-1}^\mathrm{T} Q_N A_{N-1} \right) 
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_d_N_minus_1}
+d_{N-1} = \left( R_{N-1}+B_{N-1}^\mathrm{T}Q_N B_{N-1} \right)^{-1} \left( r_{N-1}+ B_{N-1}^\mathrm{T} Q_N b_{N-1}+B_{N-1}^\mathrm{T} Q_N \right)
+\end{equation}
+$$
+
+则
+$$
+\begin{equation}
+\label{eq:KKT_u_N_minus_1_normal_type}
+u_{N-1}
+= - K_{N-1} x_{N-1} - d_{N-1}
+\end{equation}
+$$
+不难发现，这里得到的结果与动态规划求出来的结果一致。
+
+
+
+当$k=N-1$时，$\eqref{eq:KKT_lambda_k}$​​就是
+$$
+\begin{equation}
+\label{eq:KKT_lambda_N_minus_1}
+\lambda_{N-1}=Q_{N-1} x_{N-1} + S_{N-1} u_{N-1} +q_{N-1} + A_{N-1}^\mathrm{T}\lambda_{N}
+\end{equation}
+$$
+代入$\eqref{eq:KKT_lambda_N}$的$\lambda_N$  ,得
+$$
+\lambda_{N-1}=Q_{N-1} x_{N-1} + S_{N-1} u_{N-1} +q_{N-1} + A_{N-1}^\mathrm{T}\left(Q_N x_N+ q_N \right)
+$$
+再代入$\eqref{eq:KKT_u_N_minus_1_normal_type}$中的$u_{N-1}$和$k=N-1$时的状态空间方程
+$$
+x_N = A_{N-1}x_{N-1}+ B_{N-1}u_{N-1}+b_{N-1}
+$$
+得到
+$$
+\begin{aligned}
+\lambda_{N-1}
+=& Q_{N-1} x_{N-1} + S_{N-1} \left( - K_{N-1} x_{N-1} - d_{N-1}\right) \\
+&+ q_{N-1} + A_{N-1}^\mathrm{T}\left[Q_N (A_{N-1}x_{N-1}+ B_{N-1}u_{N-1}+b_{N-1})+ q_N \right]
+
+\end{aligned}
+$$
+整理得
+$$
+\begin{equation}
+\begin{aligned}
+\label{eq:KKT_lambda_N_minus_1_substitude_lambda_N_and_u_N_minus_1}
+\lambda_{N-1} =& \left[ Q_{N-1} +  A_{N-1}^\mathrm{T}Q_N A_{N-1} - \left( S_{N-1}+ A_{N-1}^\mathrm{T}Q_N B_{N-1} \right)K_{N-1}\right] x_{N-1} \\
+&+q_{N-1}+A_{N-1}^\mathrm{T}q_N + A_{N-1}^\mathrm{T}Q_N b_{N-1}
+- \left(S_{N-1}+ A_{N-1}^\mathrm{T}Q_N B_{N-1}  \right) d_{N-1} 
+\end{aligned}
+\end{equation}
+$$
+
+
+​	对比$\eqref{eq:KKT_lambda_N}$和$\eqref{eq:KKT_lambda_N_minus_1_substitude_lambda_N_and_u_N_minus_1}$可以发现，$\lambda_k$可以写成关于$x_{k}$的仿射形式（即关于$x_{k}$的线性项加一个常数项），将线性项系数即为$P_k$，常数项系数记为$p_k$，则
+
+$$
+\begin{equation}
+\label{eq:KKT_lambda_k_normal_type}
+\lambda_k = P_k x_k + p_k
+\end{equation}
+$$
+那么 $\eqref{eq:KKT_lambda_N}$就可以写成
+$$
+\begin{equation}
+\label{eq:KKT_P_and_P_border}
+P_N= Q_N,\quad p_N = q_N
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_lambda_N_normal_type}
+\lambda_N = P_N x_N + p_N
+\end{equation}
+$$
+
+同理，$\eqref{eq:KKT_lambda_N_minus_1_substitude_lambda_N_and_u_N_minus_1}$可以写成
+$$
+\begin{align}
+\label{eq:KKT_P_N_minus_1_detail}
+P_{N-1}
+=& Q_{N-1} 
++ A_{N-1} ^\mathrm{T}P_{N}A_{N-1}  
+- \left( S_{N-1}  + A_{N-1} ^\mathrm{T}Q_{N}B_{N-1}  \right) K_{N-1}  \\
+
+\label{eq:KKT_p_N_minus_1_detail}
+p_{N-1} 
+=& q_{N-1} 
++ A_{N-1} ^\mathrm{T}Q_{N}b_{N-1} 
++ A_{N-1} ^\mathrm{T} q_{N}
+- \left( S_{N-1}  + A_{N-1} ^\mathrm{T}Q_{N}B_{N-1}  \right) d_{N-1} 
+\end{align}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_lambda_N_minus_1_normal_type}
+\lambda_{N-1} = P_{N-1} x_{N-1} + p_{N-1}
+\end{equation}
+$$
+
+像这样交替求解$u_k,\lambda_{k}$，，可以求出$u_{N-2},\lambda_{N-2},\cdots,u_1,\lambda_1,u_0$
+
+> [!CAUTION]
+>
+> 注意：$\lambda_{k}$只有$k=1,2,\cdots,N$这$N$项，并没有$k=0$项！
+
+
+
+下面，我们直接对$k$​​进行推导。
+
+由于前面已发现，$\lambda_k$可以写成关于$x_{k}$的仿射形式。所以假设协态方程为
+$$
+\lambda_k = P_k x_k + p_k,\quad k= 1,\cdots,N
+$$
+也可以写为
+$$
+\begin{equation}
+\label{eq:KKT_lambda_k_plus_1_normal_type}
+\lambda_{k+1} = P_{k+1} x_{k+1} + p_{k+1},\quad k= 0,\cdots,N-1
+\end{equation}
+$$
+代入$\eqref{eq:KKT_u_k}$​，可以得到​
+$$
+u_k = -R_k^{-1}S_k^\mathrm{T}x_k - R_k^{-1}\left[ r_k + B_k^\mathrm{T}\left( P_{k+1} x_{k+1} + p_{k+1}\right) \right] ,\quad k= 0,\cdots,N-1
+$$
+代入状态空间方程
+$$
+\begin{equation}
+\label{eq:KKT_x_k_plus_1_normal_type}
+x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+可以得到
+$$
+u_k = -R_k^{-1}S_k^\mathrm{T}x_k - R_k^{-1} \{ r_k + B_k^\mathrm{T}\left[ P_{k+1} \left( A_k x_k + B_k u_k + b_k \right)+ p_{k+1} \right] \}
+, \quad k=0,1,\cdots,N-1
+$$
+整理得
+$$
+\begin{equation}
+\label{eq:KKT_u_k_detail}
+\begin{aligned}
+u_{k} = &
+-\left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( S_{k}^\mathrm{T} + B_{k}^\mathrm{T} P_{k+1} A_{k} \right) x_{k} \\
+& - \left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( r_{k}+ B_{k}^\mathrm{T} P_{k+1} b_{k}+B_{k}^\mathrm{T} p_{k+1} \right)
+\end{aligned}\quad
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+记
+$$
+\begin{equation}
+\label{eq:KKT_K_k_detail}
+K_{k} = \left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( S_{k}^\mathrm{T} + B_{k}^\mathrm{T} P_{k+1} A_{k} \right) 
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_d_k_detail}
+d_{k} = \left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( r_{k}+ B_{k}^\mathrm{T} P_{k+1} b_{k}+B_{k}^\mathrm{T} p_{k+1} \right)
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+
+代回$\eqref{eq:KKT_u_k_detail}$,得
+$$
+\begin{equation}
+\label{eq:KKT_u_k_normal_type}
+u_{k} = -K_k x_{k} -d_k
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+将$\eqref{eq:KKT_u_k_normal_type}$,$\eqref{eq:KKT_lambda_k_plus_1_normal_type}$和$\eqref{eq:KKT_x_k_plus_1_normal_type}$代入$\eqref{eq:KKT_lambda_k}$,得到
+$$
+\lambda_{k}=Q_k x_k + S_k \left( -K_k x_{k} -d_k \right) +q_k + A_k^\mathrm{T}\left[P_{k+1} \left(A_k x_k + B_k u_k + b_k \right) + p_{k+1}\right]
+, \quad k=1,2,\cdots,N-1
+$$
+整理得
+$$
+\begin{equation}
+\label{eq:KKT_lambda_k_substitude}
+\begin{aligned}
+\lambda_{k} =& \left[ Q_{k} +  A_{k}^\mathrm{T}P_{k+1} A_{k} - \left( S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k} \right)K_{k}\right] x_{k} \\
+&+q_{k}+A_{k}^\mathrm{T}p_{k+1} + A_{k}^\mathrm{T}P_{k+1} b_{k}
+- \left(S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k}  \right) d_{k} 
+\end{aligned}
+\quad,\quad k=1,2,\cdots,N-1
+\end{equation}
+$$
+记
+$$
+\begin{equation}
+\label{eq:KKT_P_k_detail}
+P_{k} = Q_{k} +  A_{k}^\mathrm{T}P_{k+1} A_{k} - \left( S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k} \right)K_{k} 
+,\quad k=1,2,\cdots,N-1
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_p_k_detail}
+p_{k} = q_{k}+A_{k}^\mathrm{T}p_{k+1} + A_{k}^\mathrm{T}P_{k+1} b_{k}
+- \left(S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k}  \right) d_{k} 
+,\quad k=1,2,\cdots,N-1
+\end{equation}
+$$
+
+代回$\eqref{eq:KKT_lambda_k_substitude}$,又可以得到$\eqref{eq:KKT_lambda_k_normal_type}$的形式
+$$
+\lambda_{k} = P_k x_{k} +p_k
+,\quad k=1,2,\cdots,N-1
+$$
+像这样交替求解$u_k,\lambda_{k}$，直至求出$u_0$​
+
+### 总结
+
+利用KKT条件中的等式，从后向前，即从$k=N$到$0$反推，每次通过互相代入消元，交替求解$u_k,\lambda_{k}$，直至求出$u_0$​
+
+求解顺序依次为：$\lambda_{N} \rightarrow u_{N-1} \rightarrow \lambda_{N-1} \rightarrow \cdots \rightarrow u_1 \rightarrow \lambda_{1} \rightarrow u_0$
+
+控制量
+$$
+\begin{equation}
+\label{eq:KKT_summary_u_k_normal_type}
+u_{k} = -K_k x_{k} -d_k
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+其中，
+$$
+\begin{equation}
+\label{eq:KKT_summary_K_k_detail}
+K_{k} = \left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( S_{k}^\mathrm{T} + B_{k}^\mathrm{T} P_{k+1} A_{k} \right) 
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_summary_d_k_detail}
+d_{k} = \left( R_{k}+B_{k}^\mathrm{T}P_{k+1} B_{k} \right)^{-1} \left( r_{k}+ B_{k}^\mathrm{T} P_{k+1} b_{k}+B_{k}^\mathrm{T} p_{k+1} \right)
+, \quad k=0,1,\cdots,N-1
+\end{equation}
+$$
+
+协态方程
+$$
+\begin{equation}
+\label{eq:KKT_summary_lambda_k_normal_type}
+\lambda_{k} = P_k x_{k} +p_k
+,\quad k=1,2,\cdots,N
+\end{equation}
+$$
+其中，
+$$
+\begin{equation}
+\label{eq:KKT_summary_P_k_detail}
+P_{k} = Q_{k} +  A_{k}^\mathrm{T}P_{k+1} A_{k} - \left( S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k} \right)K_{k} 
+,\quad k=1,2,\cdots,N-1
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:KKT_summary_p_k_detail}
+p_{k} = q_{k}+A_{k}^\mathrm{T}p_{k+1} + A_{k}^\mathrm{T}P_{k+1} b_{k}
+- \left(S_{k}+ A_{k}^\mathrm{T}P_{k+1} B_{k}  \right) d_{k} 
+,\quad k=1,2,\cdots,N-1
+\end{equation}
+$$
+
+边界条件为
+$$
+\begin{equation}
+\label{eq:KKT_summary_P_N_and_p_N}
+P_N = Q_N,\quad p_N=q_N
+\end{equation}
+$$
+
+------
+
+## 块KKT系统
+
+块KKT系统本质上跟前文的“KKT条件推导"是相同的，都是利用了KKT条件。只是”块KKT系统“将所有变量和参数写成大向量或大矩阵，从矩阵的视角来看待整个推导过程。
+
+对于一般形式的LQR问题$\eqref{eq:general_discrete_finite_time_LQR_problem_detail}$(为了方便查阅，将它在此处再写一次)
+$$
+J= \sum_{k=0}^{N-1} \left( \frac{1}{2}x_k^\mathrm{T} Q_k x_k
++ x_k^\mathrm{T} S_k u_k
++ \frac{1}{2}u_k^\mathrm{T} R_k u_k + x_k^\mathrm{T}q_k
++ u_k^\mathrm{T} r_k \right) 
++ \frac{1}{2}x_N^\mathrm{T} Q_N x_N + x_N^\mathrm{T}q_N\\
+
+s.t.\quad  x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+$$
+下面分别将目标函数和约束条件写成大矩阵形式
+
+### 目标函数的大矩阵形式
+
+首先将所有变量写成一个大向量
+$$
+\begin{equation}
+\label{eq:block_KKT_big_z}
+z=\begin{bmatrix}
+X\\U
+\end{bmatrix} 
+= \begin{bmatrix}
+x_0 \\ x_1 \\ \vdots \\ x_{N-1} \\x_N \\ 
+u_0 \\ u_1 \\ \vdots \\u_{N-1}
+\end{bmatrix}
+,\quad z \in \mathbb{R}^{[(N+1)n+Np] \times 1}
+\end{equation}
+$$
+然后将所有权重矩阵写成大矩阵形式
+$$
+\begin{equation}
+\label{eq:block_KKT_big_Q_define}
+\tilde{Q} = \begin{bmatrix}
+Q_0 & & & & \\
+& Q_1 & & & \\
+& & \ddots &&  \\
+& & & Q_{N-1} & \\
+& & & &  Q_N
+\end{bmatrix} \succeq 0 
+,\quad \tilde{Q} \in \mathbb{R}^{(N+1) n \times (N+1) n}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:block_KKT_big_R_define}
+\tilde{R} = \begin{bmatrix}
+R_0 & & & \\
+& R_1 & &  \\
+& & \ddots &  \\
+& & & R_{N-1} 
+\end{bmatrix} \succ 0 
+,\quad \tilde{R} \in \mathbb{R}^{N p \times N p}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:block_KKT_big_S_define}
+\tilde{S} = \begin{bmatrix}
+S_0 & & & \\
+& S_1 & &  \\
+& & \ddots &  \\
+& & & S_{N-1} \\
+0 & 0 & \cdots & 0 & 
+\end{bmatrix}
+,\quad \tilde{S} \in \mathbb{R}^{(N+1) n \times N p}
+\end{equation}
+$$
+
+记
+$$
+\begin{equation}
+\label{eq:block_KKT_H_define}
+H = \begin{bmatrix}
+\tilde{Q} & \tilde{S} \\
+\tilde{S}^\mathrm{T} &\tilde{R} 
+\end{bmatrix}
+,\quad H \in \mathbb{R}^{[(N+1)n+Np] \times [(N+1)n+Np]}
+\end{equation}
+$$
+将线性项的系数也写成大向量形式
+$$
+\begin{equation}
+\label{eq:block_KKT_big_q_define}
+\tilde{q} = \begin{bmatrix}
+q_0\\
+q_1 \\
+\vdots \\
+q_{N-1} \\
+q_{N}
+\end{bmatrix}
+,\quad \tilde{q} \in \mathbb{R}^{(N+1) n \times 1}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:block_KKT_big_r_define}
+\tilde{r} = \begin{bmatrix}
+r_0\\
+r_1 \\
+\vdots \\
+r_{N-1} \\
+\end{bmatrix}
+,\quad \tilde{r} \in \mathbb{R}^{N p \times 1}
+\end{equation}
+$$
+
+记
+$$
+\begin{equation}
+\label{eq:block_KKT_f_define}
+f = \begin{bmatrix}
+\tilde{q} \\ \tilde{r}
+\end{bmatrix}
+
+=\begin{bmatrix}
+q_0\\
+q_1 \\
+\vdots \\
+q_{N-1} \\
+q_{N} \\
+r_0\\
+r_1 \\
+\vdots \\
+r_{N-1} \\
+\end{bmatrix}
+,\quad f \in \mathbb{R}^{[(N+1)n+Np] \times 1}
+\end{equation}
+$$
+所以一般形式的LQR问题$\eqref{eq:general_discrete_finite_time_LQR_problem_detail}$的目标函数可写为
+$$
+\begin{equation}
+\label{eq:block_KKT_J_with_big_matrix}
+J = \frac{1}{2} z^\mathrm{T} H z + f^\mathrm{T}z
+\end{equation}
+$$
+
+### 约束条件的大矩阵形式
+
+约束条件
+$$
+x_{k+1} = A_k x_k + B_k u_k + b_k, \quad k=0,1,\cdots,N-1
+$$
+可以改写为
+$$
+- A_k x_k + x_{k+1} - B_k u_k = b_k, \quad k=0,1,\cdots,N-1
+$$
+将这$N$个约束方程都写出来：
+$$
+\begin{equation}
+\label{eq:block_KKT_N_state_space}
+\begin{alignedat}{5}
+- A_0 x_0 \;&+ I x_1        &            &            &\;&-\; B_0 u_0        &            &            &\;&=\; b_0 \\
+            &- A_1 x_1    \;&+ I x_2    &            &\;&                  &-\; B_1 u_1 &            &\;&=\; b_1 \\
+            &               &\ddots       &\qquad  \ddots      &\;&                  &      & \ddots       &  &\; \; \vdots  \\
+            &               &             &- A_{N-1} x_{N-1} \;&+ I x_N &  &         & &-\; B_{N-1} u_{N-1} &=\; b_{N-1}
+\end{alignedat}
+\end{equation}
+$$
+记
+$$
+\begin{equation}
+\label{eq:block_KKT_G}
+G = \begin{bmatrix}
+-A_0 & I 	& 0 & \cdots & 0 & -B_0 & 0    & \cdots & 0 \\
+0 	 & -A_1 & I & \cdots & 0 & 0 	& -B_1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \ddots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+0 	 & 0 & \cdots & A_{N-1} & I & 0 & 0 & \cdots & -B_{N-1}
+\end{bmatrix}
+,\quad G \in \mathbb{R}^{Nn \times [(N+1)n+Np]}
+\end{equation}
+$$
+
+$$
+\begin{equation}
+\label{eq:block_KKT_beta}
+\beta = \begin{bmatrix}
+b_0 \\ b_1 \\ \vdots \\b_{N-1}
+\end{bmatrix}
+,\quad \beta \in \mathbb{R}^{Nn \times 1}
+\end{equation}
+$$
+
+则$\eqref{eq:block_KKT_N_state_space}$可以写成矩阵形式
+$$
+\begin{equation}
+\label{eq:block_KKT_constrains_big_type}
+G z = \beta
+\end{equation}、
+$$
+
+### LQR问题的大矩阵形式
+
+综上，可以将原来的LQR问题写成大矩阵形式
+$$
+\begin{equation}
+\label{eq:block_KKT_LQR_problem_big_matrix_type}
+\begin{aligned}
+J =& \frac{1}{2} z^\mathrm{T} H z + f^\mathrm{T}z \\
+s.t.& \quad G z = \beta
+\end{aligned}
+\end{equation}、
+$$
+
+
+### 块KKT条件
+
+引入拉格朗日乘子
+$$
+\begin{equation}
+\label{eq:block_KKT_lambda}
+\lambda = \begin{bmatrix}
+\lambda_1 \\ \lambda_2 \\\vdots \\ \lambda_{N}
+\end{bmatrix}
+,\quad \lambda \in \mathbb{R}^{Nn \times 1}
+\end{equation}
+$$
+可以写出拉格朗日函数
+$$
+\begin{equation}
+\label{eq:block_KKT_lagrange_func}
+L\left( z, \lambda \right) 
+= \frac{1}{2} z^\mathrm{T} H z + f^\mathrm{T}z 
++ \lambda^\mathrm{T}(G z -\beta)
+\end{equation}
+$$
+对$z$求梯度，并令其为0
+$$
+\nabla_{z} L\left( z, \lambda \right) =0
+$$
+即
+$$
+\begin{equation}
+\label{eq:block_KKT_gradient_z}
+H z + f + \lambda^\mathrm{T} G =0
+\end{equation}
+$$
+所以KKT条件为
+$$
+\begin{align}
+\label{eq:block_KKT_condition}
+\text{Primal feasible:}& \quad
+G z = \beta \\
+
+\text{Dual feasible:}& \quad \text{not exists} \nonumber \\
+
+\text{Complementarity:}& \quad \text{not exists} \nonumber \\
+
+\text{Stationarity:}& \quad
+H z + f + \lambda^\mathrm{T} G =0
+\end{align}
+$$
+这个KKT条件也可以进一步写成矩阵形式
+$$
+\begin{equation}
+\label{eq:block_KKT_condition_big_matrix_type}
+\begin{bmatrix}
+H & G^\mathrm{T} \\
+G & 0 
+\end{bmatrix}
+\begin{bmatrix}
+z \\
+\lambda
+\end{bmatrix}
+=\begin{bmatrix}
+-f \\
+\beta
+\end{bmatrix}
+\end{equation}
+$$
+对这个矩阵方程进行求解，即可得到最优控制量。
+
+
+
+进一步，将$\eqref{eq:block_KKT_condition_big_matrix_type}$展开
+$$
+\begin{equation}
+\label{eq:block_KKT_condition_detail}
+\begin{bmatrix}
+Q_0 & 0 & \cdots & 0 & 0 & S_0 & 0 & \cdots & 0 & -A_0 & 0 & \cdots & 0 \\
+0 	& Q_1 & \cdots & 0 & 0 & 0 & S_1  & \cdots & 0 & I & -A_1 & \cdots & 0 \\
+\vdots &  \vdots & \ddots & \vdots &\vdots &\vdots & \vdots& \ddots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & Q_{N-1} & 0 & 0 & 0 &\cdots & S_{N-1} & 0 & 0 &\cdots & -A_{N-1} \\
+0 & 0 & \cdots & 0 & Q_N & 0 & 0 &\cdots & 0 & 0 & 0 &\cdots & 0 \\
+S_0 & 0 & \cdots & 0 & 0 & R_0 & 0 & \cdots & 0 & -B_0 & 0 & \cdots & 0\\
+0 & S_1 & \cdots & 0 & 0 & 0 & R_1 & \cdots & 0 & 0 & -B_1 & \cdots & 0\\
+\vdots &  \vdots & \ddots & \vdots & \vdots & \vdots &  \vdots & \ddots & \vdots & \vdots &  \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & S_{N-1} & 0 & 0 & 0 & \cdots & 0 & 0 & 0 & \cdots & -B_{N-1}\\
+-A_0 & I & \cdots & 0 & 0 & -B_0 & 0 & \cdots & 0 & 0 & 0 & \cdots & 0 \\
+0 & -A_1 & \cdots & 0 & 0 & 0 & -B_1 & \cdots & 0 & 0 & 0 & \cdots & 0 \\
+\vdots &  \vdots & \ddots & \vdots & \vdots & \vdots &  \vdots & \ddots & \vdots & \vdots &  \vdots & \ddots & \vdots \\
+0 	   & 0 	& \cdots & A_{N-1} & 0 & 0 & 0 & \cdots & -B_{N-1} & 0 & 0 & \cdots & 0 
+\end{bmatrix}
+\begin{bmatrix}
+x_0 \\ x_1 \\ \vdots \\ x_{N-1} \\ x_{N} \\
+u_0 \\ u_1 \\ \vdots \\ u_{N-1} \\
+\lambda_{1} \\ \lambda_{2} \\ \vdots \\ \lambda_{N}
+\end{bmatrix}
+=\begin{bmatrix}
+q_0\\
+q_1 \\
+\vdots \\
+q_{N-1} \\
+q_{N} \\
+
+r_0\\
+r_1 \\
+\vdots \\
+r_{N-1} \\
+
+b_0 \\ b_1 \\ \vdots \\b_{N-1}
+\end{bmatrix}
+\end{equation}
+$$
+一眼看过去，上面的矩阵非常凌乱，但是如果我们将变量$\begin{bmatrix}z & \lambda \end{bmatrix}^\mathrm{T}$按时间排序为：
+$$
+x_0,u_0, \lambda_1,\; x_1,u_1, \lambda_2,\; \cdots ,x_{N-1},u_{N-1}, \lambda_N, \; x_N
+$$
+$\eqref{eq:block_KKT_condition_detail}$就可以写成带状矩阵的形式
+$$
+\begin{equation}
+\label{eq:block_KKT_condition_sorted_by_time}
+\begin{bmatrix}
+Q_0 & S_0 & -A_0 &  &  & \\
+S_0 & R_0 & -B_0 & 0 &  & \\
+-A_0 & -B_0 & 0 & I & 0 &  \\
+ & 0 & I & Q_1 & S_1 & -A_1 & \\
+ &  & 0 & S_1 & R_1 & -B_1 & 0\\
+ &  &  & -A_1 & -B_1 & 0 & I & 0 \\
+ &  &  & 	  & \ddots &  \ddots & \ddots & \ddots & \ddots \\
+ &  &  & 	  &  & -A_{N-2} & -B_{N-2} & 0 & I & 0 \\
+ &  &  & 	  &  &  & 0 & I & Q_{N-1} & S_{N-1} & -A_{N-1} \\
+ &  &  & 	  &  &  &  & 0 & S_{N-1} & R_{N-1} & -B_{N-1} & 0 \\
+ &  &  & 	  &  &  &  & & -A_{N-1} & -B_{N-1} & 0 & I \\
+&  &  & 	  &  &  &  & &  & 0 & I & Q_N \\
+\end{bmatrix}
+\begin{bmatrix}
+x_0 \\ u_0 \\ \lambda_{1} \\ x_1 \\  u_1 \\  \lambda_{2} \\ 
+\vdots \\ 
+\lambda_{N-1} \\ x_{N-1} \\ u_{N-1} \\ \lambda_{N}\\ x_{N}  
+\end{bmatrix}
+=\begin{bmatrix}
+q_0\\
+r_0\\
+b_0 \\
+q_1 \\
+r_1 \\
+b_1 \\
+\vdots \\
+b_{N-2}\\
+q_{N-1} \\
+r_{N-1} \\
+b_{N-1} \\
+q_{N} 
+\end{bmatrix}
+\end{equation}
+$$
+​	从这个角度来看，求解LQR问题其实就是求解$\eqref{eq:block_KKT_condition_sorted_by_time}$这个矩阵方程。而从下往上消元的过程，其实就对应着前文的“KKT条件求解”的过程。
+

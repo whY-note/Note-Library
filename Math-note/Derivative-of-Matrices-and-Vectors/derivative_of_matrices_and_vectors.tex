@@ -1,0 +1,1116 @@
+%! Mode:: "TeX:UTF-8"
+%! TEX program = xelatex
+\PassOptionsToPackage{quiet}{xeCJK}
+\documentclass[withoutpreface,bwprint]{NoteBook}
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{tabular}{\zihao{-5}}
+\usepackage[numbers,sort&compress]{natbib}  % 文献管理宏包
+\usepackage[framemethod=TikZ]{mdframed}  % 框架宏包
+\usepackage{url}  % 网页链接宏包
+\usepackage{subcaption}  % 子图宏包
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+
+\title{Detivative of Matrices and Vectors 矩阵与向量的导数}  % 标题
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 正文
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 摘要
+
+% \begin{abstract}
+
+% \textbf{对于问题一,}
+
+% \textbf{对于问题二,}
+
+% \textbf{对于问题三,}
+
+% \textbf{对于问题四,}
+
+% 最后，
+
+% \keywords{聚类分析\quad  关键词\quad  关键词\quad  关键词 \quad 关键词}
+% \end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% % 目录
+% \tableofcontents  % 目录
+% \newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+% \section{符号说明}
+% \begin{table}[H]
+% \centering
+% \begin{tabularx}{\textwidth}{CLC} % 第二个{}内调整表格宽度，比如{0.8\textwidth}
+% \toprule
+% 符号    & 说明    & 单位 \\
+% \midrule
+% $m     $& 质量 & $kg$ \\
+% $V     $& 体积 & $m^3$ \\
+% \bottomrule
+% \end{tabularx}
+% \label{tab:符号说明}
+% \end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{标量函数的导数}
+\subsection{引入：标量函数对标量的导数}
+回忆标量函数对标量的求导方法，对于标量一元函数(scalar function)\cref{eq:标量方程}
+
+\begin{equation}
+    \label{eq:标量方程}  % 公式的编号
+    f(u) = u^2 - 2u + 1
+\end{equation}
+
+求导得：
+\begin{equation}
+    \label{eq:标量导数}  % 公式的编号
+    \frac{df(u)}{du}= 2u-2
+\end{equation}
+
+考虑标量二元函数的求导
+\begin{equation}
+    \label{eq:二元函数的例1}  % 公式的编号
+    f(u_1,u_2) = u_1^3 - u_2^2 + 2u_1 + 3u_2 + 1
+\end{equation}
+
+\begin{equation}
+    \label{eq:二元函数的例1求偏导}  % 公式的编号
+    \begin{cases}
+        \frac{\partial f(u_1,u_2)}{\partial u_1} = 3u_1^2  + 2\\
+        \frac{\partial f(u_1,u_2)}{\partial u_2} =  - 2u_2  + 3
+    \end{cases}
+\end{equation}
+
+\subsection{标量函数对向量的导数}
+将$u_1,u_2$组合成向量$\mathbf{u}=(u_1,u_2)^\mathrm{T}$,
+那么$f(u_1,u_2)$可以表示为$f(\mathbf{u})$
+则式\cref{eq:二元函数的例1求偏导}可以写成标量函数对向量的导数，即
+\begin{equation}
+    \label{eq:二元函数的例1对向量求导}
+        \frac{\partial f(\mathbf{u})}{\partial \mathbf{u}} =
+            \begin{bmatrix}
+            \frac{\partial f(\mathbf{u})}{\partial u_1}\\
+            \frac{\partial f(\mathbf{u})}{\partial u_2}
+            \end{bmatrix}
+            = 
+            \begin{bmatrix}
+            3 u_1^2+2\\
+            -2u_2+3
+            \end{bmatrix}
+\end{equation}
+由此可见，标量函数对向量的导数，\textbf{本质上}就是标量函数对向量的各个分量求偏导，得到的就是函数$f$的梯度$\nabla f$。
+
+将上式推广到更高维度，考虑n维向量$\mathbf{u}=(u_1,u_2,\dots, u_n)^\mathrm{T} \in \mathbb{R}^n$,
+
+\begin{equation}
+    \label{eq:标量函数的向量求导的分母布局}
+        \nabla f(\mathbf{u})
+        =
+        \frac{\partial f(\mathbf{u})}{\partial \mathbf{u}} 
+        \triangleq
+        \begin{bmatrix}
+        \frac{\partial f(\mathbf{u})}{\partial u_1}\\
+        \frac{\partial f(\mathbf{u})}{\partial u_2}\\
+        \vdots \\
+        \frac{\partial f(\mathbf{u})}{\partial u_n}\\
+        \end{bmatrix}
+\end{equation}
+式\cref{eq:标量函数的向量求导的分母布局}得到的$n \times 1$矩阵共有n行，与分母部分$\mathbf{u}$的行数相同，
+称为\textbf{分母布局(denominator layout)}。
+
+\begin{equation}
+    \label{eq:标量函数的向量求导的分子布局}
+        \frac{\partial f(\mathbf{u})}{\partial \mathbf{u}}
+        \triangleq
+        \begin{bmatrix}
+        \frac{\partial f(\mathbf{u})}{\partial u_1} & 
+        \frac{\partial f(\mathbf{u})}{\partial u_2} &
+        \dots &
+        \frac{\partial f(\mathbf{u})}{\partial u_n}\\
+        \end{bmatrix}
+\end{equation}
+式\cref{eq:标量函数的向量求导的分子布局}得到的$1 \times n$矩阵共有1行，与分子部分$f(\mathbf{u})$的行数相同，
+称为\textbf{分子布局(numerator layout)}。
+
+不难发现，分母布局与分子布局互为转置，二者没有本质区别，只是表示方式的不同。本笔记之后的推导将会统一采用分母布局。
+
+\subsection{标量函数对矩阵求导}
+假设变量$\mathbf{X}$是一个$m \times n$的矩阵，$f(\mathbf{X})$是关于变量$\mathbf{X}$的标量函数，
+使用\textbf{分母布局}，定义标量函数对矩阵的导数为
+\begin{equation}
+    \label{eq:标量函数对矩阵求导}
+    \frac{\partial f(\mathbf{X})}{\partial \mathbf{X}} 
+    \triangleq
+    \begin{bmatrix} 
+    \frac{\partial f(\mathbf{X})}{\partial x_{11}} & \frac{\partial f(\mathbf{X})}{\partial x_{12}} & \dots & \frac{\partial f(\mathbf{X})}{\partial x_{1n}} \\
+    \frac{\partial f(\mathbf{X})}{\partial x_{21}} & \frac{\partial f(\mathbf{X})}{\partial x_{22}} & \dots & \frac{\partial f(\mathbf{X})}{\partial x_{2n}} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \frac{\partial f(\mathbf{X})}{\partial x_{m1}} & \frac{\partial f(\mathbf{X})}{\partial x_{m2}} & \dots & \frac{\partial f(\mathbf{X})}{\partial x_{mn}} \\
+    \end{bmatrix} 
+\end{equation}
+
+\subsection{总结}
+标量函数对向量的导数，\textbf{本质上}就是标量函数对向量的各个分量求偏导，再按照分母布局或者分子布局排列成矩阵。
+
+同理，标量函数对矩阵的导数，\textbf{本质上}就是标量函数对矩阵的各个分量求偏导，再按照分母布局或者分子布局排列成矩阵。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{向量函数的导数}
+\subsection{向量函数对标量的导数}
+假设向量函数
+$\mathbf{f}(u) = 
+\begin{bmatrix}
+    f_1(u) & f_2(u) & \dots & f_m(u)
+\end{bmatrix}^\mathrm{T} \in \mathbb{R}^m$,
+其中$u$为标量$u \in \mathbb{R}$，
+对$u$求导数，得
+\begin{equation}
+    \label{eq:向量函数对标量的导数}
+    \frac{\partial \mathbf{f}(u)}{\partial u} = 
+    \begin{bmatrix}
+    \frac{\partial f_1}{\partial u} & \frac{\partial f_2}{\partial u} & \dots & \frac{\partial f_m}{\partial u}
+    \end{bmatrix} 
+\end{equation}
+（这里为了与后面的符号一致，求导时采用了偏导的符号，但实际上这里不是求偏导）
+
+式\cref{eq:向量函数对标量的导数}得到的是$1 \times m$矩阵,采用了分母布局。
+
+\subsection{向量函数对向量的导数}
+假设\textbf{m维}向量函数
+$\mathbf{f}(\mathbf{u}) = 
+\begin{bmatrix}
+    f_1(\mathbf{u}) & f_2(\mathbf{u}) & \dots & f_m(\mathbf{u})
+\end{bmatrix}^\mathrm{T} \in \mathbb{R}^m$,
+其中$\mathbf{u}$是\textbf{n维}向量 $\mathbf{u} \in \mathbb{R}^n$，
+对$\mathbf{u}$求导数，
+有2种顺序：
+
+
+\subsubsection{顺序1： 先按照向量函数对标量求导，再按照标量函数对向量求导}
+
+\textbf{Step1:先按照向量函数对标量求导}
+
+先把分母部分$\mathbf{u}$当作标量进行求导
+\begin{equation}
+    \label{eq:step1_向量函数对标量的导数}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} = 
+    \begin{bmatrix}
+    \frac{\partial f_1(\mathbf{u})}{\partial \mathbf{u}} & \frac{\partial f_2(\mathbf{u})}{\partial \mathbf{u}} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial \mathbf{u}}
+    \end{bmatrix} 
+\end{equation}
+
+\textbf{Step2:再按照标量函数对向量求导}
+
+式\cref{eq:step1_向量函数对标量的导数}中，每一个分量$\frac{\partial f_i(\mathbf{u})}{\partial \mathbf{u}},\quad (i=1,2,\dots,m)$的分子部分都是标量函数，接下来把$\mathbf{u}$作为向量，就可以按照标量函数对向量求导。
+
+\begin{equation}
+    \label{eq:step2_标量函数对向量求导}
+    \frac{\partial f_i(\mathbf{u})}{\partial \mathbf{u}}
+    =
+    \begin{bmatrix}
+        \frac{\partial f_i(\mathbf{u})}{\partial u_1} \\
+        \frac{\partial f_i(\mathbf{u})}{\partial u_2} \\
+        \vdots \\
+        \frac{\partial f_i(\mathbf{u})}{\partial u_n} \\
+    \end{bmatrix}
+\end{equation}
+
+综上，
+\begin{equation}
+    \label{eq:向量函数对向量的导数综合式1}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} 
+    = 
+    \begin{bmatrix}
+    \frac{\partial f_1(\mathbf{u})}{\partial \mathbf{u}} & \frac{\partial f_2(\mathbf{u})}{\partial \mathbf{u}} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial \mathbf{u}}
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        \frac{\partial f_1(\mathbf{u})}{\partial u_1} & \frac{\partial f_2(\mathbf{u})}{\partial u_1} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_1} \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_2} & \frac{\partial f_2(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_2} \\
+        \vdots                                        & \vdots                                        & \ddots & \vdots \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_n} & \frac{\partial f_2(\mathbf{u})}{\partial u_n} & \dots &  \frac{\partial f_m(\mathbf{u})}{\partial u_n}\\
+    \end{bmatrix}
+\end{equation}
+
+
+\subsubsection{顺序2： 先按照标量函数对向量求导，再按照向量函数对标量求导}
+
+\textbf{Step1:先按照标量函数对向量求导}
+
+先把分子部分$ \mathbf{f}(\mathbf{u})$当作标量函数进行求导
+\begin{equation}
+    \label{eq:step1_标量函数对向量的导数}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} = 
+    \begin{bmatrix}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_1} \\
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_2} \\
+    \vdots \\
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_n}
+    \end{bmatrix} 
+\end{equation}
+
+\textbf{Step2:再按照向量函数对标量求导}
+
+式\cref{eq:step1_标量函数对向量的导数}中，
+每一个分量$\frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_j},\quad (j=1,2,\dots,n)$ 的分母部分都是标量，接下来只要把 $\mathbf{f}(\mathbf{u})$作为向量函数，就可以按照向量函数对标量求导
+
+\begin{equation}
+    \label{eq:step2_向量函数对标量求导}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_j}
+    =
+    \begin{bmatrix}
+        \frac{\partial f_1(\mathbf{u})}{\partial u_j} & \frac{\partial f_2(\mathbf{u})}{\partial u_j}  & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_j}
+    \end{bmatrix} 
+\end{equation}
+
+综上，
+\begin{equation}
+    \label{eq:向量函数对向量的导数综合式2}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} 
+    = 
+    \begin{bmatrix}
+        \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_1} \\
+        \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_2} \\
+        \vdots \\
+        \frac{\partial \mathbf{f}(\mathbf{u})}{\partial u_n}
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        \frac{\partial f_1(\mathbf{u})}{\partial u_1} & \frac{\partial f_2(\mathbf{u})}{\partial u_1} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_1} \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_2} & \frac{\partial f_2(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_2} \\
+        \vdots                                        & \vdots                                        & \ddots & \vdots \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_n} & \frac{\partial f_2(\mathbf{u})}{\partial u_n} & \dots &  \frac{\partial f_m(\mathbf{u})}{\partial u_n}\\
+    \end{bmatrix}
+\end{equation}
+
+\subsection{总结}
+两种顺序求得的结果一致，都是
+\begin{equation}
+    \label{eq:向量函数对向量的导数综合式分母布局}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} 
+    \triangleq  
+    \begin{bmatrix}
+        \frac{\partial f_1(\mathbf{u})}{\partial u_1} & \frac{\partial f_2(\mathbf{u})}{\partial u_1} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_1} \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_2} & \frac{\partial f_2(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial f_m(\mathbf{u})}{\partial u_2} \\
+        \vdots                                        & \vdots                                        & \ddots & \vdots \\
+        \frac{\partial f_1(\mathbf{u})}{\partial u_n} & \frac{\partial f_2(\mathbf{u})}{\partial u_n} & \dots &  \frac{\partial f_m(\mathbf{u})}{\partial u_n}\\
+    \end{bmatrix}
+\end{equation}
+该结果是分母布局下的结果。
+
+它也可以写成分子布局
+\begin{equation}
+    \label{eq:向量函数对向量的导数综合式分子布局}
+    \frac{\partial \mathbf{f}(\mathbf{u})}{\partial \mathbf{u}} 
+    \triangleq  
+    \begin{bmatrix}
+        \frac{\partial f_1(\mathbf{u})}{\partial u_1} & \frac{\partial f_1(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial f_1(\mathbf{u})}{\partial u_n} \\
+        \frac{\partial f_2(\mathbf{u})}{\partial u_1} & \frac{\partial f_2(\mathbf{u})}{\partial u_2} & \dots & \frac{\partial f_2(\mathbf{u})}{\partial u_n} \\
+        \vdots                                        & \vdots                                        & \ddots & \vdots \\
+        \frac{\partial f_m(\mathbf{u})}{\partial u_1} & \frac{\partial f_m(\mathbf{u})}{\partial u_2} & \dots &  \frac{\partial f_m(\mathbf{u})}{\partial u_n}\\
+    \end{bmatrix}
+\end{equation}
+式\cref{eq:向量函数对向量的导数综合式分子布局}被称为\textbf{雅可比矩阵(Jacobi matrix)}。
+
+本笔记之后的推导将会统一采用分母布局。
+
+\section{导数和梯度}
+前面是根据导数的类型分别讨论，下面从更一般的角度来看以上的导数。
+\subsection{定义}
+\begin{definition}
+    {可微的定义} % name
+    {可微} % label
+    假设$f:\mathbb{R}^n \rightarrow \mathbb{R}^m, \quad {x} \in \mathbf{dom}  f$,如果存在矩阵$Df(x) \in \mathbb{R}^{m \times n}$满足
+    $$
+        \lim_{\|h\| \to 0} \frac{\|f(x+h) - f(x) - Df(x)h\|}{\|h\|} = 0
+    $$
+    则称函数$f$在$x$处\textbf{可微}，矩阵$Df(x)$称为$f$在$x$处的\textbf{导数（或Jacobian矩阵）}。
+\end{definition}
+
+由此可以得到导数的定义，
+\begin{definition}
+    {导数的定义} % name
+    {导数} % label
+    假设$f:\mathbb{R}^n \rightarrow \mathbb{R}^m, \quad {x} \in \mathbf{dom}  f$,函数$f$可微，
+    那么函数$f$在$x$处的\textbf{导数（或Jacobian矩阵）}$Df(x)$定义为
+    $$
+    Df(x)=\lim_{\|h\| \to 0} \frac{\|f(x+h) - f(x) \|}{\|h\|}
+    $$
+    其中，每一个分量为
+    $$
+        (Df(x))_{ij} = \frac{\partial f_i(x)}{\partial x_j}, \quad i=1,2,\dots,m, \quad j=1,2,\dots,n
+    $$
+\end{definition}
+
+所以向量函数对向量的导数的分子布局，就是这里定义的一般的导数。
+
+函数$f$在$x$处的一次逼近（类似于"切线或切平面"）为
+$$
+f(y)=f(x) + Df(x)(y-x)
+$$
+
+\begin{definition}
+    {梯度的定义} % name
+    {梯度} % label
+    假设$f:\mathbb{R}^n \rightarrow \mathbb{R}, \quad {x} \in \mathbf{dom}  f$,如果$f$在$x$处可微，则称$f$在$x$处的导数$Df(x)$的转置为$f$在$x$处的\textbf{梯度}，记作$\nabla f(x)$。
+    $$
+        \nabla f(x) = (Df(x))^\mathrm{T}
+    $$
+    这是一个列向量，$\nabla f(x) \in \mathbb{R}^{n}$。
+    其中，每一个分量为
+    $$
+        (\nabla f(x))_{j} = \frac{\partial f(x)}{\partial x_j}, \quad j=1,2,\dots,n
+    $$
+\end{definition}
+
+所以标量函数对向量的导数的分母布局，就是这里定义的一般的梯度。
+
+函数$f$在$x$处的一次逼近（类似于"切线或切平面"）为
+$$
+f(y)=f(x) + \nabla f(x)^\mathrm{T} (y-x)
+$$
+
+\subsection{根据定义求导}
+下面从用几个例子来说明如何根据定义求导数。
+
+\begin{example}
+    \label{example:二次函数的梯度}
+    考虑二次函数$f:\mathbb{R}^n \rightarrow \mathbb{R}$,
+    $$
+        f(x) = \frac{1}{2} x^\mathrm{T} A x + b^\mathrm{T} x + c
+    $$
+    其中，$A \in \mathbb{R}^{n \times n}$, $b \in \mathbb{R}^n$, $c \in \mathbb{R}$为常数。
+    求$f$的梯度$\nabla f(x)$。
+\end{example}
+
+\begin{solution}
+    \label{solution:求解二次函数的梯度}
+    \begin{equation}
+    \label{eq:二次函数的梯度推导}
+    \begin{aligned}
+        f(x+h)-f(x) 
+        =& \frac{1}{2}(x+h)^\mathrm{T} A (x+h) + b^\mathrm{T} (x+h) + c - \left(\frac{1}{2} x^\mathrm{T} A x + b^\mathrm{T} x + c\right) \\
+        =& \frac{1}{2} (x^\mathrm{T} A h + h^\mathrm{T} A x + h^\mathrm{T} A h) + b^\mathrm{T} h \\ 
+        =& \left(\frac{1}{2} (A + A^\mathrm{T}) x + b\right)^\mathrm{T} h + \frac{1}{2} h^\mathrm{T} A h
+    \end{aligned}  
+    \end{equation}
+    根据导数的定义，有
+    $$
+        Df(x)=lim_{\|h\| \to 0} \frac{\|f(x+h) - f(x) \|}{\|h\|}
+    $$
+    结合式\cref{eq:二次函数的梯度推导}，可得
+    $$
+        Df(x) = lim_{\|h\| \to 0} \frac{\|\left(\frac{1}{2} (A + A^\mathrm{T}) x + b\right)^\mathrm{T} h + \frac{1}{2} h^\mathrm{T} A h\|}{\|h\|} \\
+    $$
+    因为$\frac{\| \frac{1}{2} h^\mathrm{T} A h\|}{\|h\|}$是关于$h$的高阶无穷小，所以
+    $$
+    Df(x) = \left(\frac{1}{2} (A + A^\mathrm{T}) x + b\right)^\mathrm{T}
+    $$
+    故
+    $$
+        \nabla f(x) = (Df(x))^\mathrm{T} = \frac{1}{2} (A + A^\mathrm{T}) x + b
+    $$
+    特别地，当$A$为对称矩阵时，$\nabla f(x) = A x + b$。
+\end{solution}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{链式法则}
+\subsection{引入：标量函数对标量求导的链式法则}
+首先，回忆标量函数对标量求导的链式法则。
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.5\textwidth]{chain_rule} % 图片的文件名，不用加后缀！
+    \caption{链式法则}
+    \label{fig:chain_rule}
+\end{figure}
+
+根据\cref{fig:chain_rule},可以利用链式法则写出
+\begin{equation}
+    \label{eq:标量函数对标量求导的链式法则}
+    \begin{cases}
+        \frac{\partial J}{\partial u_1} = \frac{\partial J}{\partial y_1} \frac{\partial y_1}{\partial u_1} + \frac{\partial J}{\partial y_2} \frac{\partial y_2}{\partial u_1} +\frac{\partial J}{\partial y_3} \frac{\partial y_3}{\partial u_1} \\
+        \frac{\partial J}{\partial u_2} = \frac{\partial J}{\partial y_1} \frac{\partial y_1}{\partial u_2} + \frac{\partial J}{\partial y_2} \frac{\partial y_2}{\partial u_2} +\frac{\partial J}{\partial y_3} \frac{\partial y_3}{\partial u_2} 
+    \end{cases}    
+\end{equation}
+
+\subsection{标量函数对向量求导的链式法则}
+
+将\cref{eq:标量函数对标量求导的链式法则}写成矩阵形式
+\begin{equation}
+    \label{eq:标量函数对标量求导的链式法则变成矩阵形式}
+    \begin{bmatrix}
+        \frac{\partial J}{\partial u_1}\\
+        \frac{\partial J}{\partial u_2}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \frac{\partial y_1}{\partial u_1} & \frac{\partial y_2}{\partial u_1} & \frac{\partial y_3}{\partial u_1}  \\
+        \frac{\partial y_1}{\partial u_2} &  \frac{\partial y_2}{\partial u_2} &  \frac{\partial y_3}{\partial u_2}
+    \end{bmatrix}
+    \begin{bmatrix}
+        \frac{\partial J}{\partial y_1} \\
+        \frac{\partial J}{\partial y_2} \\
+        \frac{\partial J}{\partial y_3}
+    \end{bmatrix}
+\end{equation}
+
+假设
+$\mathbf{u}=
+\begin{bmatrix}
+    u_1 & u_2
+\end{bmatrix}^\mathrm{T},
+\quad 
+\mathbf{y}(\mathbf{u})=
+\begin{bmatrix}
+    y_1(\mathbf{u}) & y_2(\mathbf{u}) & y_3(\mathbf{u})
+\end{bmatrix}^\mathrm{T},
+$
+则依据分母布局，有
+$$
+\frac{\partial J}{\partial \mathbf{u}}
+=
+\begin{bmatrix}
+    \frac{\partial J}{\partial u_1}\\
+    \frac{\partial J}{\partial u_2}
+\end{bmatrix},
+\quad
+\frac{\partial \mathbf{y}}{\partial \mathbf{u}}
+=
+\begin{bmatrix}
+    \frac{\partial y_1}{\partial u_1} & \frac{\partial y_2}{\partial u_1} & \frac{\partial y_3}{\partial u_1}  \\
+        \frac{\partial y_1}{\partial u_2} &  \frac{\partial y_2}{\partial u_2} &  \frac{\partial y_3}{\partial u_2}
+\end{bmatrix},
+\quad
+\frac{\partial J}{\partial \mathbf{y}}
+=
+\begin{bmatrix}
+    \frac{\partial J}{\partial y_1} \\
+    \frac{\partial J}{\partial y_2} \\
+    \frac{\partial J}{\partial y_3}
+\end{bmatrix}
+$$
+从而式\cref{eq:标量函数对标量求导的链式法则变成矩阵形式}可以进一步写成
+\begin{equation}
+    \label{eq:标量函数对向量求导的链式法则}
+    \frac{\partial J}{\partial \mathbf{u}}
+    =
+    \frac{\partial \mathbf{y}}{\partial \mathbf{u}} \frac{\partial J}{\partial \mathbf{y}}
+\end{equation}
+将$\mathbf{u}$推广到$n \times 1$向量，$\mathbf{y}$推广到$m \times 1$向量，此式仍然成立。
+式\cref{eq:标量函数对向量求导的链式法则}就是标量函数对向量求导的链式法则。
+
+\begin{theorem}
+    {标量函数对向量求导的链式法则}
+    {标量函数对向量求导的链式法则}
+    若$\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n,
+    \quad 
+    \mathbf{y}(\mathbf{u})=
+    \begin{bmatrix}
+        y_1(\mathbf{u}) & y_2(\mathbf{u}) & \dots & y_m(\mathbf{u})
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^m
+    $，
+    有标量函数$J=f(\mathbf{y}(\mathbf{u}))$，则
+    $$
+        \frac{\partial J}{\partial \mathbf{u}}
+        =
+        \frac{\partial \mathbf{y}}{\partial \mathbf{u}} \frac{\partial J}{\partial \mathbf{y}}
+    $$
+\end{theorem}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{常用的矩阵求导公式}
+\begin{matrixDerivativeEquation}
+    {} % 公式的具体名称，若无，则不填，但是需要占位
+    {矩阵求导公式4_1} % label
+    If 
+    $\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n$ and
+    $\mathbf{f}=
+    \begin{bmatrix}
+        f_1 & f_2 & \dots & f_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n
+    $, then
+    $$
+    \frac{\partial (\mathbf{u}^\mathrm{T}\mathbf{f})}{\partial \mathbf{u}} 
+    =
+    \frac{\partial (\mathbf{f}^\mathrm{T}\mathbf{u})}{\partial \mathbf{u}} 
+    =
+    \mathbf{f}
+    $$
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+\begin{equation}
+    \mathbf{u}^\mathrm{T}\mathbf{f}=
+    \begin{bmatrix} 
+    u_1 & u_2 & \dots & u_n
+    \end{bmatrix}
+    \begin{bmatrix} 
+    f_1 \\
+    f_2 \\ 
+    \vdots \\ 
+    f_n
+    \end{bmatrix}
+    =u_1 f_1 + u_2 f_2 + \dots + u_n f_n
+\end{equation}
+
+根据式\cref{eq:标量函数的向量求导的分母布局}，可得
+\begin{equation}
+    \frac{\partial (\mathbf{u}^\mathrm{T}\mathbf{f})}{\partial \mathbf{u}} 
+    =
+    \begin{bmatrix} 
+    \frac{\partial (u_1 f_1 + u_2 f_2 + \dots + u_n f_n)}{\partial u_1} \\
+    \frac{\partial (u_1 f_1 + u_2 f_2 + \dots + u_n f_n)}{\partial u_2} \\
+    \vdots \\
+    \frac{\partial (u_1 f_1 + u_2 f_2 + \dots + u_n f_n)}{\partial u_n} \\
+    \end{bmatrix} 
+    =
+    \begin{bmatrix} 
+    f_1 \\
+    f_2 \\
+    \vdots \\
+    f_n \\
+    \end{bmatrix} 
+    =
+    \mathbf{f}
+\end{equation}
+因为    
+$$
+\mathbf{u}^\mathrm{T}\mathbf{f}
+=
+\mathbf{f}^\mathrm{T}\mathbf{u}
+$$
+所以
+\begin{equation}
+    \frac{\partial (\mathbf{f}^\mathrm{T}\mathbf{u})}{\partial \mathbf{u}} 
+    =
+    \frac{\partial (\mathbf{u}^\mathrm{T}\mathbf{f})}{\partial \mathbf{u}} 
+    =
+    \mathbf{f}    
+\end{equation}
+    
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_2}
+    If
+    $\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n$ and
+    $\mathbf{A}$ is a n by n matrix, then
+    $$
+    \frac{\partial (\mathbf{A}\mathbf{u})}{\partial \mathbf{u}} 
+    =
+    \mathbf{A}^\mathrm{T}
+    $$
+    
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+记矩阵$\mathbf{A}$行向量的转置分别为
+$$
+\mathbf{a}_1=
+\begin{bmatrix}
+    a_{11} & a_{12} & \dots & a_{1n}
+\end{bmatrix}^\mathrm{T}, 
+$$
+$$
+\mathbf{a}_2=
+\begin{bmatrix}
+    a_{21} & a_{22} & \dots & a_{2n}
+\end{bmatrix}^\mathrm{T},
+$$
+$$
+\dots
+$$
+$$
+\mathbf{a}_n=
+\begin{bmatrix}
+    a_{n1} & a_{n2} & \dots & a_{nn}
+\end{bmatrix}^\mathrm{T}
+$$
+那么矩阵$\mathbf{A}$可以表示为
+$$
+\mathbf{A}=
+\begin{bmatrix}
+    \mathbf{a}_1^\mathrm{T} \\
+    \mathbf{a}_2^\mathrm{T} \\
+    \vdots \\
+    \mathbf{a}_n^\mathrm{T}
+\end{bmatrix}
+$$
+从而可以把$\mathbf{A}\mathbf{u}$写为
+\begin{equation}
+    \label{eq:矩阵求导公式4_2证明式1}
+    \mathbf{A}\mathbf{u}=
+    \begin{bmatrix}
+        \mathbf{a}_1^\mathrm{T} \\
+        \mathbf{a}_2^\mathrm{T} \\
+        \vdots \\
+        \mathbf{a}_n^\mathrm{T}
+    \end{bmatrix}
+    \mathbf{u}
+    =
+    \begin{bmatrix}
+        \mathbf{a}_1^\mathrm{T} \mathbf{u} \\
+        \mathbf{a}_2^\mathrm{T} \mathbf{u} \\
+        \vdots \\
+        \mathbf{a}_n^\mathrm{T} \mathbf{u}
+    \end{bmatrix}
+\end{equation}
+
+将$\mathbf{u}$当作标量，利用式\cref{eq:向量函数对标量的导数}，得：
+\begin{equation}
+    \label{eq:矩阵求导公式4_2证明式2}
+    \frac{\partial \mathbf{A}\mathbf{u}}{\partial \mathbf{u}} 
+    =
+    \begin{bmatrix} 
+    \frac{\partial \mathbf{a}_1^\mathrm{T} \mathbf{u}}{\partial \mathbf{u}} & \frac{\partial \mathbf{a}_2^\mathrm{T} \mathbf{u}}{\partial \mathbf{u}} & \dots & \frac{\partial \mathbf{a}_n^\mathrm{T} \mathbf{u}}{\partial \mathbf{u}}
+    \end{bmatrix} 
+\end{equation}
+再利用\textbf{\cref{mde:矩阵求导公式4_1}},
+对于$i=1,2,\dots,n$,有
+\begin{equation}
+    \label{eq:矩阵求导公式4_2证明式3}
+    \frac{\partial \mathbf{a}_i^\mathrm{T} \mathbf{u}}{\partial \mathbf{u}} 
+    =
+    \mathbf{a}_i
+\end{equation}
+
+结合\cref{eq:矩阵求导公式4_2证明式2}和\cref{eq:矩阵求导公式4_2证明式3}，得：
+\begin{equation}
+    \label{eq:矩阵求导公式4_2证明式4}
+    \frac{\partial \mathbf{A}\mathbf{u}}{\partial \mathbf{u}} 
+    =
+    \begin{bmatrix} 
+    \mathbf{a}_1 & \mathbf{a}_2 & \dots & \mathbf{a}_n
+    \end{bmatrix} \\
+    =
+    \begin{bmatrix} 
+    a_{11} & a_{21} & \dots & a_{n1} \\
+    a_{12} & a_{22} & \dots & a_{n2} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    a_{1n} & a_{2n} & \dots & a_{nn} \\
+    \end{bmatrix}
+    =
+    \mathbf{A}^\mathrm{T}
+\end{equation}
+    
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_3}
+    If
+    $\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n$ and
+    $\mathbf{A}$ is a n by n matrix, then
+    $$
+    \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}}
+    =
+    \mathbf{A} \mathbf{u} + \mathbf{A}^\mathrm{T} \mathbf{u} 
+    $$
+    
+    Specially, if $\mathbf{A}$ is a symmetric matrix, 
+    which means $\mathbf{A} = \mathbf{A}^\mathrm{T}$, 
+    so
+    $$
+    \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}}
+    =
+    2 \mathbf{A} \mathbf{u}
+    $$
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+$$
+    \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} 
+    =
+    \begin{bmatrix}
+    u_1 & u_2 & \dots & u_n 
+    \end{bmatrix}
+    \begin{bmatrix}
+        a_{11} & a_{12} & \dots & u_{1n} \\
+        a_{21} & a_{22} & \dots & u_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \dots & u_{nn} 
+    \end{bmatrix}
+    \begin{bmatrix}
+        u_1 \\ 
+        u_2 \\ 
+        \vdots \\
+        u_n 
+    \end{bmatrix} \\
+$$
+利用矩阵乘法公式可得
+\begin{align}
+    \label{eq:矩阵求导公式4_3的展开式}
+    \nonumber
+    \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} 
+    &=
+    \nonumber
+    \begin{bmatrix}
+    u_1 & u_2 & \dots & u_n 
+    \end{bmatrix}
+    \begin{bmatrix}
+        a_{11} & a_{12} & \dots & u_{1n} \\
+        a_{21} & a_{22} & \dots & u_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \dots & u_{nn} 
+    \end{bmatrix}
+    \begin{bmatrix}
+        u_1 \\ 
+        u_2 \\ 
+        \vdots \\
+        u_n 
+    \end{bmatrix} \\
+    &=
+    \nonumber
+    u_1 a_{11} u_1 + u_2 a_{21} u_1 + \dots + u_n a_{n1} u_1 \\
+    & \nonumber
+    + u_1 a_{12} u_2 + u_2 a_{22} u_2 + \dots + u_n a_{n2} u_2 \\
+    & \nonumber
+    + \dots \\
+    &+ u_1 a_{1n} u_n + u_2 a_{2n} u_n  + \dots + u_n a_{nn} u_n 
+\end{align}
+
+显然$\mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} $是一个标量，因此$ \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}}$是标量函数对向量求导，
+根据式\cref{eq:标量函数的向量求导的分母布局}和\cref{eq:矩阵求导公式4_3的展开式}
+\begin{align}
+    \label{eq:矩阵求导公式4_3的证明式1}
+    \nonumber
+    \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}}
+    & \nonumber
+    =
+    \begin{bmatrix}
+        \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial u_1} \\
+        \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial u_2} \\
+        \vdots \\
+        \frac{\partial ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial u_n} 
+    \end{bmatrix}\\
+    & \nonumber
+    =
+    \begin{bmatrix}
+        u_1 a_{11}  + u_2 a_{21} + \dots + u_n a_{n1} + a_{11} u_1+ a_{12} u_2 +\dots + a_{1n} u_n  \\
+        u_1 a_{12}  + u_2 a_{22} + \dots + u_n a_{n2} + a_{21} u_1+ a_{22} u_2 +\dots + a_{2n} u_n   \\
+        \vdots \\
+        u_1 a_{1n}  + u_2 a_{2n} + \dots + u_n a_{nn} + a_{n1} u_1+ a_{n2} u_2 +\dots + a_{nn} u_n 
+    \end{bmatrix}\\
+    &\nonumber
+    =
+    \begin{bmatrix}
+        a_{11} u_1+ a_{12} u_2 +\dots + a_{1n} u_n \\
+        a_{21} u_1+ a_{22} u_2 +\dots + a_{2n} u_n  \\
+        \vdots \\
+        a_{n1} u_1+ a_{n2} u_2 +\dots + a_{nn} u_n 
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        u_1 a_{11}  + u_2 a_{21} + \dots + u_n a_{n1}  \\
+        u_1 a_{12}  + u_2 a_{22} + \dots + u_n a_{n2}  \\
+        \vdots \\
+        u_1 a_{1n}  + u_2 a_{2n} + \dots + u_n a_{nn} \\
+    \end{bmatrix} \\
+    &= \mathbf{A}\mathbf{u} + \mathbf{A}^\mathrm{T}\mathbf{u} 
+\end{align}
+
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_4}
+    If
+    $\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n$ and
+    $\mathbf{A}$ is a n by n matrix, then
+    $$
+    \frac{\partial^2 ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}^2}
+    =
+    \mathbf{A} + \mathbf{A}^\mathrm{T}
+    $$
+    
+    Specially, if $\mathbf{A}$ is a symmetric matrix, 
+    which means $\mathbf{A} = \mathbf{A}^\mathrm{T}$, 
+    so
+    $$
+    \frac{\partial^2 ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}^2}
+    =
+    2 \mathbf{A} 
+    $$
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+由\cref{mde:矩阵求导公式4_3}可知
+\begin{align}
+    \label{eq:矩阵求导公式4_4证明式1}
+    \nonumber
+    \frac{\partial^2 ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}^2}
+    & \nonumber
+    =
+    \frac{\partial }{\partial \mathbf{u}} \frac{\partial  \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u}}{\partial \mathbf{u}} \\
+    & \nonumber
+    =
+    \frac{\partial }{\partial \mathbf{u}} (\mathbf{A} \mathbf{u} + \mathbf{A}^\mathrm{T} \mathbf{u} ) \\
+    &=
+    \frac{\partial \mathbf{A} \mathbf{u}}{\partial \mathbf{u}}  + \frac{\partial \mathbf{A} \mathbf{u}^\mathrm{T}}{\partial \mathbf{u}}
+\end{align}
+
+结合式\cref{mde:矩阵求导公式4_2}，得
+\begin{equation}
+    \label{eq:矩阵求导公式4_4证明式2}
+    \frac{\partial \mathbf{A} \mathbf{u}}{\partial \mathbf{u}}=\mathbf{A}^\mathrm{T},
+    \quad 
+    \frac{\partial \mathbf{A} \mathbf{u}^\mathrm{T}}{\partial \mathbf{u}}=\mathbf{A}
+\end{equation}
+
+将\cref{eq:矩阵求导公式4_4证明式2}代入\cref{eq:矩阵求导公式4_4证明式1},得到
+\begin{equation}
+    \label{eq:矩阵求导公式4_4证明式3}
+    \frac{\partial^2 ( \mathbf{u}^\mathrm{T} \mathbf{A} \mathbf{u} )}{\partial \mathbf{u}^2}
+    =
+    \mathbf{A}^\mathrm{T} + \mathbf{A}
+\end{equation}
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_5}
+    If
+    $\mathbf{u}=
+    \begin{bmatrix}
+        u_1 & u_2 & \dots & u_n     
+    \end{bmatrix}^\mathrm{T} \in \mathbb{R}^n,\quad \mathbf{A}$ is a m by n matrix, 
+    $\mathbf{y}(\mathbf{u})=\mathbf{A}\mathbf{u}$
+    and $\mathbf{B}$ is a m by m symmetric matrix, $J=\mathbf{y}^\mathrm{T}\mathbf{B}\mathbf{y}$,
+    then
+    $$
+    \frac{\partial J}{\partial \mathbf{u}}
+    =
+    2 \mathbf{A}^\mathrm{T} \mathbf{B} \mathbf{y}
+    $$
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+根据\textbf{\cref{thm:标量函数对向量求导的链式法则}}
+\begin{equation}
+    \label{eq:矩阵求导公式4_5证明式1}
+    \frac{\partial J}{\partial \mathbf{u}}
+    =
+    \frac{\partial \mathbf{y}}{\partial \mathbf{u}} \frac{\partial J}{\partial \mathbf{y}}
+    =
+    \frac{\partial \mathbf{y}}{\partial \mathbf{u}} \frac{\partial (\mathbf{y}^\mathrm{T}\mathbf{B}\mathbf{y}) }{\partial \mathbf{y}}
+\end{equation}
+
+由\cref{mde:矩阵求导公式4_2}可知
+\begin{equation}
+    \label{eq:矩阵求导公式4_5证明式2}
+    \frac{\partial \mathbf{y}}{\partial \mathbf{u}} =\mathbf{A}^\mathrm{T}
+\end{equation}
+
+由\cref{mde:矩阵求导公式4_3}可知
+\begin{equation}
+    \label{eq:矩阵求导公式4_5证明式3}
+    \frac{\partial (\mathbf{y}^\mathrm{T}\mathbf{B}\mathbf{y}) }{\partial \mathbf{y}} = 2 \mathbf{B} \mathbf{y}
+\end{equation}
+
+将\cref{eq:矩阵求导公式4_5证明式2}和\cref{eq:矩阵求导公式4_5证明式3}代入\cref{eq:矩阵求导公式4_5证明式1}，得
+\begin{equation}
+    \label{eq:矩阵求导公式4_5证明式4}
+    \frac{\partial J}{\partial \mathbf{u}}
+    =
+    2 \mathbf{A}^\mathrm{T} \mathbf{B} \mathbf{y}
+\end{equation}
+
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_6}
+    If
+    $\mathbf{A}$ is a n by n matrix and 
+    $\mathbf{X}$ is a n by n symmetric matrix, then
+    $$
+    \frac{\partial tr(\mathbf{X}\mathbf{A}^\mathrm{T})}{\partial \mathbf{X}}
+    =
+    \mathbf{A}
+    $$
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+\begin{equation}
+    \label{eq:计算矩阵相乘后的迹}
+    tr(\mathbf{X}\mathbf{A}^\mathrm{T})
+    =a_{11} x_{11} + a_{12} x_{12} + \dots + a_{ij} x_{ij} + \dots + a_{n(n-1)} x_{n(n-1)} + a_{nn} x_{nn}
+    =\sum_{i=1}^{n} \sum_{j=1}^{n} a_{ij} x_{ij}
+\end{equation}
+代入\cref{eq:标量函数对矩阵求导}，可得
+\begin{equation}
+    \frac{\partial tr(\mathbf{X}\mathbf{A}^\mathrm{T})}{\partial \mathbf{X}}
+    =
+    \begin{bmatrix}
+        a_{11} & a_{12} & \dots & a_{1n} \\
+        a_{21} & a_{22} & \dots & a_{2n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} & a_{n2} & \dots & a_{nn} \\
+    \end{bmatrix}
+    = \mathbf{A}
+\end{equation}
+
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{matrixDerivativeEquation}
+    {}
+    {矩阵求导公式4_7}
+    If
+    $\mathbf{A}$ is a n by n matrix and 
+    $\mathbf{X}$ is a n by n symmetric matrix, then
+    $$
+    \frac{\partial tr(\mathbf{X}\mathbf{A} \mathbf{X}^\mathrm{T})}{\partial \mathbf{X}}
+    =
+    \mathbf{K}(\mathbf{A}+\mathbf{A}^\mathrm{T})
+    $$
+
+    Specially, if $\mathbf{A}$ is a symmetric matrix, which means $\mathbf{A}=\mathbf{A}^\mathrm{T}$,
+    then
+    $$
+    \frac{\partial tr(\mathbf{X}\mathbf{A} \mathbf{X}^\mathrm{T})}{\partial \mathbf{X}}
+    = 
+    2 \mathbf{X} \mathbf{A}
+    $$
+
+\end{matrixDerivativeEquation}
+
+\begin{proof}
+    略，暴力展开即可得证。
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{定理块的插入}
+% \begin{theorem}
+%     {我的定理} % name
+%     {定理1} % label
+%     dadsdfsa
+% \end{theorem}
+
+% \cref{thm:定理1}是这样的 % 引用方式
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section{图表的插入}
+% 切记：“上表下图”，即表格的标题在其上方，图的标题在其下方
+% \subsection{表格的插入}
+
+% 表格应具有三线表格式，因此常用 booktabs宏包，其标准格式如\cref{tab:001}~所示。
+
+% \begin{table}[!htbp]
+%     \caption{标准三线表格}\label{tab:001} \centering
+%     \begin{tabular}{cccccc} % 选择对齐方式：c:居中，l:左，r:右
+%         \toprule[1.5pt] %表格最上面的线的线宽
+%         $D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
+%         \midrule[1pt] %表格最中间的线的线宽
+%         5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
+%         10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
+%         20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
+%         \bottomrule[1.5pt] %表格最下面的线的线宽
+%     \end{tabular}
+% \end{table}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%
+% \subsection{图的插入}
+
+% 先把图片导入到figures文件夹，然后再按照以下代码插入到论文中。
+% 插入的图片如 \cref{fig:circuit-diagram}~所示。
+
+% \begin{figure}[!ht]
+%     \centering % 图片居中
+%     \includegraphics[width=.8\textwidth]{beautiful_sight} % 图片的文件名，不用加后缀！
+%     \caption{风景图}
+%     \label{fig:circuit-diagram}
+% \end{figure}
+
+% 代码解释：
+
+% [!h] 是 位置参数，告诉 LaTeX 希望图片放在哪：
+% \begin{itemize}[itemindent=2em]
+% \item h (here)：尽量放在当前位置。
+
+% \item t (top)：放在页面顶部。
+
+% \item b (bottom)：放在页面底部。
+
+% \item p (page of floats)：单独放在一个只包含浮动体的页面。
+
+% \item ! (override)：忽略 LaTeX 的部分限制，更强制地按照指定位置放。
+
+% \end{itemize}
+
+% [!h] 就是強烈要求放在目前位置。
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 参考文献
+\nocite{*}
+\bibliographystyle{gbt7714-numerical}  % 引用格式
+\bibliography{ref.bib}  % bib源
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 附录
+% \begin{appendices}
+% \section{文件列表}
+% \begin{table}[H]
+% \centering
+% \begin{tabularx}{\textwidth}{LL}
+% \toprule
+% 文件名   & 功能描述 \\
+% \midrule
+% q1.m & 问题一程序代码 \\
+% q2.py & 问题二程序代码 \\
+% q3.c & 问题三程序代码 \\
+% q4.cpp & 问题四程序代码 \\
+% \bottomrule
+% \end{tabularx}
+% \label{tab:文件列表}
+% \end{table}
+
+% \section{代码}
+% \noindent q1.m
+% \lstinputlisting[language=matlab]{code/q1.m}
+% q2.py
+% \lstinputlisting[language=python]{code/q2.py}
+% q3.c
+% \lstinputlisting[language=c]{code/q3.c}
+% q4.cpp
+% \lstinputlisting[language=c++]{code/q4.cpp}
+% \end{appendices}
+\end{document}
+
+
