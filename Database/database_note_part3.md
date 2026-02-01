@@ -1127,7 +1127,7 @@ $\sigma_{A \leq a}(r)$:  $n_r \cdot \frac{v - \min(A, r)}{\max(A, r) - \min(A, r
 
 对于 ,令r(R)和s(S)为两个关系
 
-- 若$R\cap S=\varnothing$,则两关系没有共同属性,此时$r\Join s=r\$T_i$mes s$
+- 若$R\cap S=\varnothing$,则两关系没有共同属性,此时$r\Join s=r\times s$
 - 若$R\cap S$是R或S的码,则此时得到元组数与r或s中的元组数相同
 - 若$R \cap S$既不是R也不是S的码,假定$R \cap S = \{A\}$,此时应该有$(n_r\times n_s)/V(A,s)$个元组
 
@@ -1158,4 +1158,4 @@ $\sigma_{A \leq a}(r)$:  $n_r \cdot \frac{v - \min(A, r)}{\max(A, r) - \min(A, r
 
 ![image-20260108192517576](database_note_part3.assets/image-20260108192517576.png)
 
-许多优化器允许为查询优化指定**优化成本预算**,当超过预算时停止搜索,返回当前找到的最优计
+许多优化器允许为查询优化指定**优化成本预算**,当超过预算时停止搜索,返回当前找到的最优执行计划
