@@ -29,9 +29,10 @@ Welcome to my Note Library!
 
 比如：在机器学习、控制理论等领域中，需要用到矩阵求导。这是研究生课程《矩阵论》的内容，但是对于大部分本科生而言，都是未学过这部分内容的。针对这个问题，我就整理了矩阵求导的数学知识，一方面方便自己查阅，另一方面也希望帮到其他还未学过矩阵求导的同学。
 
-| 文件夹                                                       | 包含内容 | 是否已更新完成 |
-| ------------------------------------------------------------ | -------- | -------------- |
-| [Math-note/Derivative-of-Matrices-and-Vectors](Math-note/Derivative-of-Matrices-and-Vectors) | 矩阵求导 | ✅              |
+| 文件夹                                                       | 包含内容         | 是否已更新完成 |
+| ------------------------------------------------------------ | ---------------- | -------------- |
+| [Math-note/Derivative-of-Matrices-and-Vectors](Math-note/Derivative-of-Matrices-and-Vectors) | 矩阵求导         | ✅              |
+| [Math-note/Sigmoid-function](Math-note/Sigmoid-function)     | Sigmoid 函数介绍 | ✅              |
 
 ### 个人拓展笔记
 
