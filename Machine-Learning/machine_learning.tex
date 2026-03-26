@@ -1,0 +1,2306 @@
+%! Mode:: "TeX:UTF-8"
+%! TEX program = xelatex
+\PassOptionsToPackage{quiet}{xeCJK}
+\documentclass[withoutpreface,bwprint]{NoteBook}
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{tabular}{\zihao{-5}}
+\usepackage[numbers,sort&compress]{natbib}  % 文献管理宏包
+\usepackage[framemethod=TikZ]{mdframed}  % 框架宏包
+\usepackage{url}  % 网页链接宏包
+\usepackage{subcaption}  % 子图宏包
+
+\usepackage{lipsum} % 用于生成占位文本
+
+% 算法伪代码库
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\usepackage{tcolorbox} % 文本框宏包
+\tcbuselibrary{skins, breakable, theorems}
+
+\title{Machine Learning 机器学习}  % 论文标题
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 正文
+\begin{document}
+
+\maketitle
+% \begin{abstract}
+% 摘要
+
+% \textbf{对于问题一,}
+
+% \textbf{对于问题二,}
+
+% \textbf{对于问题三,}
+
+% \textbf{对于问题四,}
+
+% 最后，
+
+% \keywords{聚类分析\quad  关键词\quad  关键词\quad  关键词 \quad 关键词}
+% \end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% 目录
+\tableofcontents  % 目录
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+% \section{符号说明}
+% \begin{table}[H]
+% \centering
+% \begin{tabularx}{\textwidth}{CLC} % 第二个{}内调整表格宽度，比如{0.8\textwidth}
+% \toprule
+% 符号    & 说明    & 单位 \\
+% \midrule
+% $m     $& 质量 & $kg$ \\
+% $V     $& 体积 & $m^3$ \\
+% \bottomrule
+% \end{tabularx}
+% \label{tab:符号说明}
+% \end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{线性回归模型}
+\subsection{线性回归模型的建立}
+最简单的线性回归模型是输入变量的线性组合。线性回归模型是利用输入变量的线性组合拟合样本数据。
+
+假设一个样本数据$(\mathbf{x},y)$，其中$\mathbf{x}$共有n个属性，即有n个维度，即$\mathbf{x} = (x_1, x_2, \dots, x_n)^\mathrm{T} \in \mathbb{R}^n, $
+$ x_i \in \mathbb{R}, \quad i=1,2,\dots ,n $,
+它所对应的输出变量为$y$。
+
+线性回归模型是一个线性函数
+\begin{equation}
+    \label{eq:线性回归模型标量式1}  % 公式的编号
+    f(\mathbf{x},\mathbf{w},b) = b + w_1 x_1 + \dots + w_n x_n 
+\end{equation}
+其中，$b$是线性函数的截距，$\mathbf{w} = (w_1, \dots, w_n)^\mathrm{T}$
+
+下面将式\cref{eq:线性回归模型标量式1}写成紧凑的矩阵形式，
+\begin{equation}
+    \label{eq:线性回归模型矩阵式1}  % 公式的编号
+    f(\mathbf{x},\mathbf{w},b)  = b + \mathbf{x}^\mathrm{T} \mathbf{w} 
+\end{equation}
+
+
+为了得到更加统一的形式，令式\cref{eq:线性回归模型标量式1}中的$b=w_0$
+则有
+\begin{equation}
+    \label{eq:线性回归模型标量式2}  % 公式的编号
+    f(\mathbf{x},\mathbf{w}) = w_0 + w_1 x_1 + \dots + w_n x_n 
+\end{equation}
+
+在之后的推导中，若无特殊说明，都会使用$w_0$来表示截距，而不用$b$来表示。
+
+假设
+$\tilde{\mathbf{x}} = (1, x_1, x_2, \dots, x_n)^\mathrm{T}, $ % 使用 \mathrm 表示转置
+$\mathbf{w} = (w_0, w_1, \dots, w_n)^\mathrm{T},$
+则式\cref{eq:线性回归模型标量式2}可以写为
+\begin{equation}
+    \label{eq:线性回归模型矩阵式2}  % 公式的编号
+    f(\tilde{\mathbf{x}},\mathbf{w}) = \tilde{\mathbf{x}}^\mathrm{T} \mathbf{w}
+\end{equation}
+在这里，我将$\tilde{\mathbf{x}} $称为增广的样本输入（向量）。
+
+\begin{tcolorbox}[title={注意：},fonttitle=\bfseries,colframe=red!70!black,colback=red!10!white]
+\begin{enumerate}
+    \item 式\cref{eq:线性回归模型矩阵式2}中的$\tilde{\mathbf{x}}$ 比 式\cref{eq:线性回归模型矩阵式1}中的$\mathbf{x}$ 多了一个1
+    \item 此时的$y$仍然是一个标量。
+\end{enumerate}
+\end{tcolorbox}
+
+
+用$\hat{y}$表示模型的预测值，那么线性回归模型的预测值就是模型的输出：
+\begin{equation}
+    \label{eq:线性回归模型的预测值}
+    \hat{y}=f(\tilde{\mathbf{x}},\mathbf{w}) 
+\end{equation}
+
+不可避免地，样本数据的观测值与模型的预测值之间存在误差，一般认为这个误差服从均值为0的正态分布。
+因此，样本数据的观测值与模型的预测值之间的关系为
+\begin{equation}
+    \label{eq:样本数据的观测值与模型的预测值之间的关系} 
+    y=\hat{y}+\varepsilon, \quad \varepsilon \thicksim  N(0,\sigma ^2)
+\end{equation}
+将式\cref{eq:线性回归模型的预测值}代入式\cref{eq:样本数据的观测值与模型的预测值之间的关系} ，可得样本数据的观测值与样本输入之间的关系
+\begin{equation}
+    \label{eq:样本数据的观测值与样本输入之间的关系} 
+    y=f(\tilde{\mathbf{x}},\mathbf{w}) +\varepsilon, \quad \varepsilon \thicksim  N(0,\sigma ^2)
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{模型求解}
+在求解模型时，考虑在实际情况下，我们有一个含有m个样本的样本数据集
+$D=\left\{ (\mathbf{x}_1,y_1), (\mathbf{x}_2,y_2),\dots, (\mathbf{x}_m,y_m) \right\} = \{ (\mathbf{x}_i,y_i) \}_{i=1}^{m}$。
+
+模型的求解本质上是根据已有的样本数据集，求解出模型的参数
+下面使用2种方法分别求解线性回归模型，即求解模型参数$\mathbf{w}$。
+
+\subsubsection{利用最小二乘法求解}
+
+最小二乘法(Least square method)本质上是要求预测值与观测值（真实值）尽可能地接近。
+
+假设利用模型预测得到的预测值分别为$\hat{y}_i ,\quad (i=1,2,\dots, m) $,
+为了衡量预测值与观测值之间的接近程度，采用\textbf{均方误差(Mean Square Error, MSE)}作为损失函数(Loss function)
+\begin{equation}
+    \label{eq:损失函数形式1}
+    L\left ( \mathbf{w} \right ) = \frac{1}{m}\sum_{i=1}^{m} \left ( \hat{y}_i-y_i \right )^2 \\
+\end{equation}
+
+将式\cref{eq:线性回归模型的预测值}代入\cref{eq:损失函数形式1}，得到：
+\begin{equation}
+    \label{eq:损失函数形式2}
+    L\left ( \mathbf{w} \right ) = \frac{1}{m}\sum_{i=1}^{m} \left (f(\tilde{\mathbf{x}}_i,\mathbf{w}) - y_i \right )^2 \\
+\end{equation}
+
+通过最小化均方误差以使得预测值与观测值尽可能接近，由此可以写出以下优化问题
+\begin{equation}
+    \min_{\mathbf{w}} L\left ( \mathbf{w} \right )  = \min_{\mathbf{w}} \frac{1}{m}\sum_{i=1}^{m} \left [ f(\tilde{\mathbf{x}}_i,\mathbf{w}) - y_i \right ]^2    
+\end{equation}
+
+
+对于线性回归模型，将式\cref{eq:线性回归模型矩阵式2}代入\cref{eq:损失函数形式2}，得到：
+\begin{equation}
+    \label{eq:线性回归模型损失函数形式}
+    L\left ( \mathbf{w} \right ) = \frac{1}{m}\sum_{i=1}^{m} \left (\tilde{\mathbf{x}}_i^\mathrm{T} \mathbf{w}   -y_i \right )^2 \\
+\end{equation}
+通过最小化函数$L(\mathbf{w})$,即可求解出模型的最优参数$\mathbf{w}$。
+
+
+下面进一步将\cref{eq:线性回归模型损失函数形式}写成更紧凑的矩阵形式，更加便于求解。
+
+在样本数据集$D=\left\{ (\mathbf{x}_1,y_1), (\mathbf{x}_2,y_2),\dots, (\mathbf{x}_m,y_m) \right\}$中，
+记增广的样本输入向量
+
+$$
+\tilde{\mathbf{x}}_i
+= 
+\begin{bmatrix} 
+    1 \\
+    \mathbf{x}_i
+\end{bmatrix}
+= 
+\begin{bmatrix} 
+    1 \\
+    x_{i1} \\
+    x_{i2}\\
+    \vdots \\
+    x_{in}
+\end{bmatrix}
+$$
+
+然后将每个观测值$y_i$与其增广的样本输入向量$\tilde{\mathbf{x}}_i$按照式 \cref{eq:样本数据的观测值与样本输入之间的关系} 写出
+\begin{equation}
+\label{观测值与增广的样本输入向量之间关系的展开式}
+\begin{cases}
+    y_1 = f(\tilde{\mathbf{x}}_1,\mathbf{w})+\varepsilon_1, \\
+    y_2 = f(\tilde{\mathbf{x}}_2,\mathbf{w})+\varepsilon_2, \\
+    \quad   \vdots \\
+    y_m = f(\tilde{\mathbf{x}}_m,\mathbf{w})+\varepsilon_m
+\end{cases}
+\end{equation}
+
+对于线性回归模型，将式\cref{eq:线性回归模型矩阵式2}代入式\cref{观测值与增广的样本输入向量之间关系的展开式},得到
+\begin{equation}
+    \label{观测值与增广的样本输入向量之间线性关系的展开式}
+    \begin{cases}
+        y_1 = \tilde{\mathbf{x}}_1^\mathrm{T}\mathbf{w} +\varepsilon_1 = w_0 + x_{11}w_1 + x_{12}w_2 + \dots + x_{1n}w_n + \varepsilon_1 \\
+        y_2 = \tilde{\mathbf{x}}_2^\mathrm{T}\mathbf{w} +\varepsilon_2 = w_0 + x_{21}w_1 + x_{22}w_2 + \dots + x_{2n}w_n + \varepsilon_2 \\
+        \quad    \vdots \\
+        y_m = \tilde{\mathbf{x}}_m^\mathrm{T}\mathbf{w} +\varepsilon_m = w_0 + x_{m1}w_1 + x_{m2}w_2 + \dots + x_{mn}w_n + \varepsilon_m 
+    \end{cases}
+\end{equation}
+
+记
+$$
+\mathbf{X}=\begin{bmatrix} \tilde{\mathbf{x}}_1^\mathrm{T}  \\  \tilde{\mathbf{x}}_2^\mathrm{T}  \\ \vdots \\\tilde{\mathbf{x}}_m^\mathrm{T}  \end{bmatrix} 
+          =\begin{bmatrix} 1 & {\mathbf{x}}_1^\mathrm{T}  \\ 1 & {\mathbf{x}}_2^\mathrm{T}  \\ \vdots & \vdots \\ 1 & {\mathbf{x}}_m^\mathrm{T}  \end{bmatrix} 
+          =\begin{bmatrix}
+            1 & x_{11} & x_{12} & \dots & x_{1n} \\
+            1 & x_{21} & x_{22} & \dots & x_{2n} \\
+            \vdots & \vdots & \vdots & \ddots & \vdots \\
+            1 & x_{m1} & x_{m2} & \dots & x_{mn} \\            
+          \end{bmatrix}
+,\quad
+\mathbf{y} = 
+\begin{bmatrix}
+    y_1 \\
+    y_2 \\
+    \vdots \\
+    y_m \\
+\end{bmatrix}
+,\quad
+\bm{\varepsilon}=
+\begin{bmatrix}
+    \varepsilon _1 \\
+    \varepsilon _2 \\
+    \vdots \\
+    \varepsilon _m \\
+\end{bmatrix}
+$$
+则式\cref{观测值与增广的样本输入向量之间线性关系的展开式}可以写为更紧凑的矩阵形式
+\begin{equation}
+    \label{观测值与增广的样本输入向量之间线性关系的矩阵形式}
+    \mathbf{y} = \mathbf{X} \mathbf{w} + \bm{\varepsilon},\quad \bm{\varepsilon} \thicksim N(\mathbf{0},\Sigma ^2) 
+\end{equation}
+那么均方误差损失函数即为
+\begin{equation}
+    \label{eq:损失函数矩阵形式}
+    L\left ( \mathbf{w} \right ) = \frac{1}{m} \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right )^\mathrm{T} \left (\mathbf{X} \mathbf{w} - \mathbf{y} \right ) \\
+\end{equation}
+
+\begin{tcolorbox}[title={注解：},fonttitle=\bfseries,colframe=green!30!black,colback=green!10!white]
+    式\cref{eq:损失函数矩阵形式}是式\cref{eq:线性回归模型损失函数形式}的二次型形式，因此二式其实等价。
+\end{tcolorbox}
+
+通过最小化损失函数$L\left ( \mathbf{w} \right )$
+\begin{equation}
+    \label{eq:最小化损失函数}
+    \min_{\mathbf{w}} L\left ( \mathbf{w} \right ) = \frac{1}{m} \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right )^\mathrm{T} \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right ) \\
+\end{equation}
+即可求得线性回归模型的最优参数$\mathbf{w}$。
+
+对\cref{eq:损失函数矩阵形式}求导,得：
+\begin{align}
+    \label{eq:损失函数矩阵形式求导}
+    \frac{\partial L\left ( \mathbf{w} \right )}{\partial \mathbf{w}}
+    &= \frac{\partial}{\partial \mathbf{w}} \frac{1}{m} \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right )^\mathrm{T} \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right ) \nonumber \\
+    &= \frac{2}{m} \mathbf{X}^\mathrm{T}  \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right )
+\end{align}
+令导数为0
+\begin{equation}
+    \label{eq:令导数为0}
+    \frac{2}{m} \mathbf{X}^\mathrm{T}  \left (\mathbf{X} \mathbf{w} -\mathbf{y} \right ) = 0
+\end{equation}
+移项得：
+\begin{equation} 
+    \mathbf{X}^\mathrm{T} \mathbf{X} \mathbf{w} =  \mathbf{X}^\mathrm{T} \mathbf{y}
+\end{equation}
+假如$\mathbf{X}^{\mathrm{T}} \mathbf{X}$是可逆矩阵，则可以得到$\mathbf{w}$解析解
+\begin{equation} 
+    \mathbf{w} = (\mathbf{X}^\mathrm{T} \mathbf{X})^{-1} \mathbf{X}^\mathrm{T} \mathbf{y}
+\end{equation}
+最终，求解得到的线性回归模型为
+\begin{equation} 
+    \label{求解得到的线性回归模型}
+    \hat{\mathbf{y}}= \tilde{\mathbf{x}}^\mathrm{T} (\mathbf{X}^\mathrm{T} \mathbf{X})^{-1} \mathbf{X}^\mathrm{T} \mathbf{y}
+\end{equation}
+
+缺点：
+\begin{enumerate}
+    \item $\mathbf{X}^\mathrm{T} \mathbf{X}$的逆不一定存在。
+    \item 当矩阵维度特别大时，求逆耗时大。
+\end{enumerate}
+
+使用梯度下降法求解可以避免以上问题：
+\begin{equation}
+    \mathbf{w}_{t+1} = \mathbf{w}_{t} - \eta \left. \frac{\partial L\left ( \mathbf{w} \right )}{\partial \mathbf{w}} \right|_{\mathbf{w}=\mathbf{w}_t}
+\end{equation}
+代入式\cref{eq:损失函数矩阵形式求导}，得
+\begin{equation}
+    \mathbf{w}_{t+1} = \mathbf{w}_{t} - \eta \frac{2}{m} \mathbf{X}^\mathrm{T}  \left (\mathbf{X} \mathbf{w}_{t} -\mathbf{y} \right )
+\end{equation}
+
+\subsubsection{利用最大似然估计求解}
+最大似然估计的核心思想是通过概率建模，令样本观测值发生的概率最大。
+
+设随机变量$Y$($Y \in \mathbb{R}$是一个标量),
+$$
+Y= f(\tilde{\mathbf{x}},\mathbf{w}) + \varepsilon, \quad \varepsilon \thicksim N(0,\sigma ^2)
+$$
+所以
+$$
+Y- f(\tilde{\mathbf{x}},\mathbf{w}) = \varepsilon \thicksim N(0,\sigma ^2)
+$$
+从而得到随机变量$Y$的分布
+\begin{equation}
+    Y \thicksim N(f(\tilde{\mathbf{x}},\mathbf{w}),\sigma ^2)
+\end{equation}
+
+$Y$ 有观测值:$Y_1, Y_2, \dots, Y_m$,假设它们之间独立同分布。
+那么$Y_1=y_1, Y_2=y_2, \dots, Y_m=y_m$的概率为
+\begin{align}
+      & P(Y_1=y_1, Y_2=y_2, \dots, Y_m=y_m) \nonumber \\
+    = & P(Y_1=y_1)P(Y_2=y_2) \dots P(Y_m=y_m) \nonumber \\
+    = & \prod_{i=1}^{m} P(Y_i=y_i) \nonumber\\
+    = & \prod_{i=1}^{m} \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y_i-f(\mathbf{x_i},\mathbf{w}))^2}{2\sigma^2}} 
+\end{align} 
+根据最大似然的定义（令样本数据发生的可能性最大），上式即为最大似然函数(maximum likelihood function)$L(\mathbf{w})$
+\begin{equation}
+    \label{eq:正态分布最大似然估计一般式}
+    L(\mathbf{w}) = \prod_{i=1}^{m} \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y_i-f(\mathbf{x_i},\mathbf{w}))^2}{2\sigma^2}} 
+\end{equation}
+
+对于线性回归模型，将式\cref{eq:线性回归模型矩阵式2}代入式\cref{eq:正态分布最大似然估计一般式}，可得
+\begin{equation}
+    \label{eq:正态分布最大似然估计求解线性回归模型}
+    L(\mathbf{w})
+    = \prod_{i=1}^{m} \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(y_i- \mathbf{x_i}^\mathrm{T} \mathbf{w})^2}{2\sigma^2}} 
+\end{equation} 
+两边取\textbf{对数}，得
+\begin{equation}
+    \label{eq:正态分布最大似然估计求解线性回归模型取对数}
+      \ln{L(\mathbf{w})}
+    = -\sum_{i=1}^{m} \frac{(y_i- \mathbf{x_i}^\mathrm{T} \mathbf{w})^2}{2\sigma^2}-\frac{m}{2} \ln{(2\pi\sigma^2)}
+\end{equation} 
+通过令式\cref{eq:正态分布最大似然估计求解线性回归模型取对数}最大化，求解出取得最大值时的$\mathbf{w}$即为模型的最优参数
+
+可以发现，式\cref{eq:正态分布最大似然估计求解线性回归模型取对数}中，$2\sigma^2$和$\frac{m}{2} \ln{(2\pi\sigma^2)}$都是常数，不会影响优化问题的结果。
+因此，最小化函数\cref{eq:线性回归模型损失函数形式}与最大化函数\cref{eq:正态分布最大似然估计求解线性回归模型取对数}其实是等价的。
+
+
+\subsection{线性回归模型的推广}
+\subsubsection{广义线性模型 (Generalized Linear Model)}
+式\cref{eq:线性回归模型的预测值} 等号左边是输出变量的预测值$\hat{y}$本身，
+将其推广为单调可微函数$g(\hat{y})$,就是广义线性模型(Generalized Linear Model,GLM)
+
+\begin{equation}
+    \label{eq:广义线性模型}  % 公式的编号
+    g(\hat{y}) = w_0 + w_1 x_1 + \dots + w_n x_n 
+\end{equation}
+
+\subsubsection{广义加性模型 (Generalized Additive Model)}
+定义基函数$\phi (\mathbf{x})$ 是关于输入变量$\mathbf{x}=(x_1, x_2, \dots, x_n)^\mathrm{T} $的非线性函数。
+
+式\cref{eq:线性回归模型标量式2} 等号右边是输入变量$x_1, x_2, \dots, x_n$的线性组合，
+我们将其推广为输入变量的函数$\phi_j(\mathbf{x}),(j=0,1,2,\dots,n)$的线性组合,就是广义加性模型 (Generalized Additive Model,GAM)
+特别地，$\phi_0=1$
+
+\begin{equation}
+    \label{eq:广义加性模型}  % 公式的编号
+    f(\bm{\phi},\mathbf{w}) = w_0 + w_1 \phi_1(\mathbf{x}) + \dots + w_n \phi_n(\mathbf{x}) 
+\end{equation}
+
+记 
+$
+\bm{\phi}=(\phi_0, \phi_1, \dots, \phi_n)^\mathrm{T}
+$
+则\cref{eq:广义加性模型} 可以写为
+\begin{equation}
+    \label{eq:广义加性模型矩阵形式}  % 公式的编号
+    f(\bm{\phi},\mathbf{w}) = \mathbf{w}^\mathrm{T} \bm{\phi}
+\end{equation}
+
+求解方法与普通的线性回归模型相同。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{线性分类模型}
+线性分类模型根据所分得类别的数量，可以分为二分类模型与多分类模型。
+\subsection{线性二分类模型的建立}
+
+
+\subsubsection{激活函数的选取}
+!!! Todo: 这部分的逻辑有问题 !!!
+
+在二分类问题中，对于一个样本数据$(\mathbf{x},y)$,输出变量$y$不再是一个连续值，而是表示类别，即
+\begin{equation}
+    \begin{cases}
+        y=0, \quad if \quad \mathbf{x} \in \mathcal{C}_1 \\
+        y=1, \quad if \quad \mathbf{x} \in \mathcal{C}_2
+    \end{cases}
+\end{equation}
+
+显然，能够满足以上要求的函数是单位阶跃函数
+$$
+u(x)=
+\begin{cases}
+    1, \quad x \geq 0\\
+    0, \quad x < 0
+\end{cases}
+$$
+可是这个函数在x=0处不可微，不便于求导等数学分析工具的使用。
+因此，考虑与$u(x)$图像相似，但在实数轴上处处连续可微的sigmoid函数
+$$
+\sigma (x)= \frac{1}{1+e^{-x}}
+$$
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=1\textwidth]{sigmoid_function} % 图片的文件名，不用加后缀！
+    \caption{单位阶跃函数与sigmoid函数}
+    \label{fig:单位阶跃函数与sigmoid函数}
+\end{figure}
+
+\subsubsection{模型的建立}
+在式\cref{eq:线性回归模型矩阵式2}中，
+$\tilde{\mathbf{x}}^\mathrm{T}\mathbf{w}$得到的是一个在$\mathbb{R}$上的连续值，对于回归任务，这是合适的。
+而对于分类任务，需要的是0或1的离散值，因此考虑使用单位阶跃函数将$\mathbb{R}$上的连续值映射到为0或1的离散值，
+经过前文的讨论，单位阶跃函数不可微，不便于数学分析，使用sigmoid函数既方便数学分析，又可以把$\mathbb{R}$上的连续值大部分映射到接近0或者接近1的值，当然也有部分值被映射到$(0,1)$中间。
+
+将$\tilde{\mathbf{x}}^\mathrm{T}\mathbf{w}$经sigmoid函数映射后，得到
+\begin{equation}
+    f(\tilde{\mathbf{x}},\mathbf{w}) = \sigma (\tilde{\mathbf{x}}^\mathrm{T}\mathbf{w})    
+\end{equation}
+即
+\begin{equation}
+    \label{eq:logistics回归模型}
+    f(\tilde{\mathbf{x}},\mathbf{w}) = \frac{1}{1+e^{-\tilde{\mathbf{x}}^\mathrm{T} \mathbf{w}}}
+\end{equation}
+这便是logistics回归模型。
+
+因此，模型的预测值$\hat{y}$为
+\begin{equation}
+    \hat{y}= \frac{1}{1+e^{-\tilde{\mathbf{x}}^\mathrm{T} \mathbf{w}}}
+\end{equation}
+
+对\cref{eq:logistics回归模型}作Logit变换，即
+$$
+logit(\hat{y}) = \ln{\frac{\hat{y}}{1-\hat{y}}} 
+$$
+得到
+\begin{equation}
+    \label{eq:logistics回归模型形式2}
+    \ln{\frac{\hat{y}}{1-\hat{y}}} = \tilde{\mathbf{x}}^\mathrm{T} \mathbf{w}
+\end{equation}
+这是logistics回归模型的另一种等价形式，可以视为$g(\hat{y})=\ln{\frac{\hat{y}}{1-\hat{y}}} $时的广义线性模型，见
+式\cref{eq:广义线性模型}
+
+\subsection{模型求解}
+\subsubsection{利用最小二乘法求解}
+
+\begin{equation}
+    \ln{\frac{\hat{y}}{1-\hat{y}}} = \tilde{\mathbf{x}}^\mathrm{T} \mathbf{w}
+\end{equation}
+
+
+\subsection{线性多分类模型}
+线性多分类模型，也被称为（单层）感知机模型。
+对于一个样本集 $ D = \{(\mathbf{x}_i, y_i)\}_{i=1}^m$，共分成$K$类($\mathcal{C}_1,\dots, \mathcal{C}_K$)， 
+其中$\mathbf{x}_i \in \mathbb{R}$,$y_i (i=1,2, \dots, m)$是类别标签。
+
+记独热向量为
+$$
+\mathbf{e}_1 = 
+\begin{bmatrix} 
+    1\\
+    0\\
+    0\\
+    \vdots\\
+    0\\
+\end{bmatrix}
+,\quad 
+\mathbf{e}_2 = 
+\begin{bmatrix} 
+    0\\
+    1\\
+    0\\
+    \vdots\\
+    0\\
+\end{bmatrix}
+, \quad 
+\mathbf{e}_3 =
+\begin{bmatrix} 
+    0\\
+    0\\
+    1\\
+    \vdots\\
+    0\\
+\end{bmatrix}
+, \quad 
+\mathbf{e}_K = 
+\begin{bmatrix} 
+    0\\
+    0\\
+    0\\
+    \vdots\\
+    1\\
+\end{bmatrix}
+$$
+
+对于$\forall  i, \quad i = 1,2, \dots, m$,
+若$\mathbf{x}_i$属于第k类，则$y_i$用独热向量表示为：
+$$
+y_i = \mathbf{e}_k ,\quad if \quad \mathbf{x}_i \in \mathcal{C}_k
+$$
+
+通过线性变换
+\begin{equation}
+    \label{eq:线性变换}
+    \mathbf{z} = w^\mathrm{T} \mathbf{x} + \mathbf{b}
+\end{equation}
+其中，样本点$\mathbf{x} \in \mathbb{R}^n$,权重矩阵$w \in \mathbb{R}^{n \times K} $, 
+偏移$\mathbf{b} \in \mathbb{R}^{K}$,
+线性变换后得到$\mathbf{z} \in \mathbb{R}^K$
+
+例如：若$K=4$, 可能得到$\mathbf{z} = \begin{bmatrix}
+    2, 5, -1,0 
+\end{bmatrix}^\mathrm{T}$
+这4个分量分别代表了样本$\mathbf{x}$在4个分类中的数值。
+
+对$\mathbf{z}$的所有分量取最大值$max$，得到最大分量所在的分量位置$j$就是样本所属的分类索引，即
+$$
+j = arg \max_{j} z_j
+$$
+从而可以将预测值$\hat{y}$表示为独热向量
+\begin{equation}
+    \hat{y} = \mathbf{e}_j
+\end{equation}
+
+延续前面的例子，$\mathbf{z} = \begin{bmatrix}
+    2, 5, -1,0 
+\end{bmatrix}^\mathrm{T}$的最大分量为5，它是第2个分量，则$j=2$
+故$\hat{y}=\begin{bmatrix}
+    0,
+    1,
+    0,
+    0
+\end{bmatrix}^\mathrm{T}$
+
+但是，$max$函数并不连续可微，因此，使用$softmax$函数对$max$函数进行近似，既能保留大小关系，又有连续可微的数学性质，
+同时，$softmax$函数的输出向量是归一化的，即$\sum_{j=1}^{K} softmax(\mathbf{z})_j = 1$
+\begin{equation}
+    \label{eq:softmax}
+   softmax(\mathbf{z})_j = \frac{e^{\mathbf{z}_j}}{\sum_{k=1}^{K} e^{\mathbf{z}_k}} \qquad j = 1,2, \dots, K
+\end{equation}
+
+综合起来，可以得到线性多分类模型
+\begin{equation}
+    \label{eq:线性多分类模型}
+    \hat{y} = softmax(w^\mathrm{T} \mathbf{x} + \mathbf{b})
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{多层感知机}
+\subsection{基本思路}
+\cref{fig:多层感知机基本思路}中最左边是线性多分类器，
+将$x$换成非线性函数${\phi}_i(x)$,则可以转化为一个简单的非线性多分类器（对应\cref{fig:多层感知机基本思路}中间的模型）。
+进一步，对$x$作线性变换$wx$
+如果让非线性函数${\phi}_i(x)$也变成关于$wx$ 的函数，则该模型将变成一个2层感知机（对应\cref{fig:多层感知机基本思路}最右边的模型）。
+\begin{figure}[!h]
+    \centering % 图片居中
+    \includegraphics[width=1.0\textwidth]{多层感知机基本思路.jpg} % 图片的文件名，不用加后缀！
+    \caption{多层感知机基本思路}
+    \label{fig:多层感知机基本思路}
+\end{figure}
+
+再进一步，将\cref{fig:多层感知机基本思路}最右边模型的输入 $x$作线性变换$wx$，并换成$\phi_i(wx)$
+则可以得到一个3层的感知机。
+
+重复以上操作，可以得到任意层数的感知机。
+
+一般地，将 $\phi$ 记为 激活函数 $a$，
+
+\subsection{前向传播}
+根据线性多分类模型（感知机）\cref{eq:线性多分类模型}，很容易得到2层感知机的前向传播过程：
+\begin{equation}
+    \label{eq:2层感知机的前向传播过程}
+    \hat{y} = softmax(\mathbf{w}_2^\mathrm{T} a(\mathbf{w}_1^\mathrm{T} x) + \mathbf{b})
+\end{equation}
+
+由此可以推广到L层感知机的前向传播过程：
+\begin{equation}
+    \label{eq:L层感知机的前向传播过程}
+    \hat{y} = softmax(\mathbf{w}_{L}^\mathrm{T} a(\mathbf{w}_{L-1}^\mathrm{T} a(\mathbf{w}_{L-2}^\mathrm{T} \dots a(\mathbf{w}_1^\mathrm{T} x) \dots) + \mathbf{b}) + \mathbf{b})
+\end{equation}
+
+\subsection{反向传播}
+\begin{figure}[!h]
+    \centering % 图片居中
+    \includegraphics[width=1.0\textwidth]{多层感知机反向传播.jpg} % 图片的文件名，不用加后缀！
+    \caption{反向传播} 
+    \label{fig:反向传播}
+\end{figure}
+如\cref{fig:反向传播}所示，假如现在要求损失函数$\mathcal{L}$
+关于第$l-1$层与第$l$层之间的权重${W}^{(l)}$的梯度$\frac{\partial \mathcal{L} }{\partial {W}^{(l)}}$。
+
+首先考虑损失函数$\mathcal{L}$关于 第$l-1$层第$k$个激活函数与第$l$层第$i$个激活函数之间的权重${W}_{k,i}^{(l)}$的梯度
+$\frac{\partial \mathcal{L} }{\partial {W}_{k,i}^{(l)}}$
+\begin{equation}
+    \label{eq:损失函数关于权重的梯度}
+    \frac{\partial \mathcal{L} }{\partial {W}_{k,i}^{(l)}} = \frac{\partial \mathcal{L} }{\partial h_{l,i}} \frac{\partial h_{l,i}}{\partial \tilde{h}_{l,i}} \frac{\partial \tilde{h}_{l,i}}{\partial {W}_{k,i}^{(l)}}
+\end{equation}
+
+由于
+\begin{equation}
+    \label{eq:激活函数的输入输出关系}
+    h_{l,i} = a(\tilde{h}_{l,i})
+\end{equation}
+所以
+\begin{equation}
+    \label{eq:激活函数的输入输出之间的梯度}
+    \frac{\partial h_{l,i}}{\partial \tilde{h}_{l,i}} = a'(\tilde{h}_{l,i})
+\end{equation}
+
+由于
+\begin{equation}
+    \label{eq:前后两层输入输出之间的关系}
+    \tilde{h}_{l,i} = W_{k,i}^{(l)} h_{l-1,k}
+\end{equation}
+所以
+\begin{equation}
+    \label{eq:后层对权重求梯度}
+    \frac{\partial \tilde{h}_{l,i}}{\partial {W}_{k,i}^{(l)}} = h_{l-1,k}
+\end{equation}
+将\cref{eq:激活函数的输入输出之间的梯度}和\cref{eq:前后两层输入输出之间的关系}
+代入\cref{eq:损失函数关于权重的梯度},得到
+\begin{equation}
+    \label{eq:求第l层第i个神经元权重的梯度}
+    \frac{\partial \mathcal{L} }{\partial {W}_{k,i}^{(l)}} = \frac{\partial \mathcal{L} }{\partial h_{l,i}} a'(\tilde{h}_{l,i}) h_{l-1,k}
+\end{equation}
+
+因此，损失函数$\mathcal{L}$关于 第$l-1$层与第$l$层之间的权重${W}^{(l)}$的梯度为
+\begin{equation}
+    \label{eq:求第l层权重的梯度矩阵形式}
+    \frac{\partial \mathcal{L} }{\partial {W}^{(l)}} = \left( \mathbf{a}'(\mathbf{\tilde{h}}_{l}) \odot \frac{\partial \mathcal{L} }{\partial \mathbf{h}_{l}} \right) \mathbf{h}_{l-1}^\mathrm{T}
+\end{equation}
+
+下面再求损失函数$\mathcal{L}$关于第$l$层输出$\mathbf{h}_{l}$的梯度$\frac{\partial \mathcal{L} }{\partial \mathbf{h}_{l}} $
+
+先考虑损失函数$\mathcal{L}$关于第$l$层第$i$个激活函数输出${h}_{l,i}$的梯度$\frac{\partial \mathcal{L} }{\partial {h}_{l,i}}$
+
+\begin{align}
+    \label{eq:求第l层第i个神经元输出的梯度}
+    \frac{\partial \mathcal{L} }{\partial h_{l,i}} 
+    =& \sum_{j=1}^{m} \left( \frac{\partial \mathcal{L}}{\partial h_{l+1,j}} 
+                            \frac{\partial h_{l+1,j}}{\partial \tilde{h}_{l+1,j}} 
+                            \frac{\partial \tilde{h}_{l+1,j}}{\partial h_{l,i}}  \right) \nonumber \\
+    =& \sum_{j=1}^{m} \left( \frac{\partial \mathcal{L}}{\partial h_{l+1,j}} a'(\tilde{h}_{l+1,j}) W_{i,j}^{(l+1)} \right)
+\end{align}
+
+因此，损失函数$\mathcal{L}$关于第$l$层输出$\mathbf{h}_{l}$的梯度为
+\begin{equation}
+    \label{eq:求第l层输出的梯度矩阵形式}
+    \frac{\partial \mathcal{L} }{\partial \mathbf{h}_{l}} = W^{(l+1) \mathrm{T}} \left( \mathbf{a}'(\mathbf{\tilde{h}}_{l+1}) \odot \frac{\partial \mathcal{L} }{\partial \mathbf{h}_{l+1}} \right) 
+\end{equation}
+
+反复利用\cref{eq:求第l层权重的梯度矩阵形式}和\cref{eq:求第l层输出的梯度矩阵形式}，就可以求得损失函数关于所有权重的梯度，
+然后再利用梯度下降法，就可以更新权重参数，达到训练的效果。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{支持向量机}
+\textbf{基本思路：}如\cref{fig:支持向量机基本思路}所示，在空间中寻找一个超平面将两个类别分开，而且要位于两类样本点的“正中间”，即超平面要离两类样本点尽可能远，
+从而使得这个划分超平面对两类样本的局部扰动的容忍度较高（鲁棒性高）。
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.6\textwidth]{支持向量机基本思路.jpg} % 图片的文件名，不用加后缀！
+    \caption{支持向量机基本思路}
+    \label{fig:支持向量机基本思路}
+\end{figure}
+
+\subsection{空间向量基础知识}
+\subsubsection{超平面}
+在三维空间中，平面可以表示为
+$$
+Ax + By + Cz + D = 0
+$$
+其中，$A,B,C,D$都是常数，$(A,B,C)^\mathrm{T}$是平面的法向量。
+
+推广到$d$维空间中，超平面可以表示为
+\begin{equation}
+    \label{eq:超平面的一般形式}
+    \mathbf{w}^\mathrm{T} \mathbf{x} + b = 0
+\end{equation}
+其中，$\mathbf{x} \in \mathbb{R}^d$, $\mathbf{w} \in \mathbb{R}^d$是超平面的法向量，$b \in \mathbb{R}$是偏置。
+
+\subsubsection{点到超平面的距离}
+$d$维空间中任意一点$\mathbf{x} \in \mathbb{R}^\mathrm{T}$到超平面\cref{eq:超平面的一般形式}的距离为：、
+\begin{equation}
+    \label{eq:点到超平面的距离}
+    d = \frac{ \left| \mathbf{w}^\mathrm{T}\mathbf{x}+b \right| }{ \left \| \mathbf{w} \right \|   }
+\end{equation}
+
+\subsection{线性支持向量机}
+线性支持向量机又称为线性最大间隔分类器(Linear Maximum Margin Classifier)，
+其本质是利用一个线性的超平面将两个类别分开，并且使得两类样本点的间隔最大，也就是使得该超平面到两类样本点的距离最大。
+
+\subsubsection{优化问题}
+假设一个样本数据集$D=\left\{ (\mathbf{x}_1,y_1), (\mathbf{x}_2,y_2),\dots, (\mathbf{x}_m,y_m) \right\} = \{ (\mathbf{x}_i,y_i) \}_{i=1}^{m}$,
+其中，$\mathbf{x}_i \in \mathbb{R}^n$是第i个样本的输入向量，$y_i \in \{-1, +1\}$是第i个样本的类别标签。
+类别标签$y_i$与样本输入向量$\mathbf{x}_i$之间的关系为
+$$
+\begin{cases}
+    y_i = 1, \quad if \quad \mathbf{x}_i \in \mathcal{C}_1 \\
+    y_i = -1, \quad if \quad \mathbf{x}_i \in \mathcal{C}_2
+\end{cases}
+$$
+
+在基本思路的指导下，假设所找到的划分超平面为
+\begin{equation}
+    \label{eq:划分超平面}
+    \mathbf{w}^\mathrm{T} \mathbf{x} + b = 0
+\end{equation}
+
+其中，$\mathbf{x} \in \mathbb{R}^n$, $\mathbf{w} \in \mathbb{R}^n$
+
+那么利用超平面进行决策的方法是：
+\begin{equation}
+    \label{eq:超平面进行决策的方法}
+    \begin{cases}
+        \mathbf{w}^\mathrm{T} \mathbf{x_i} + b > 0, \quad if \quad y_i =1 \\
+        \mathbf{w}^\mathrm{T} \mathbf{x_i} + b < 0, \quad if \quad y_i =-1
+    \end{cases}
+\end{equation}
+
+距离划分超平面最近的点就被称为\textbf{支持向量}，记为$\mathbf{x}_s$
+两个异类支持向量所在的超平面被称为“间隔边界”。
+
+\begin{criticalSteps}
+    {缩放变换}
+    {}
+
+为了后面的计算方便，做以下\textbf{缩放变换}：
+
+对超平面方程\cref{eq:划分超平面}两边同时乘一个系数$\varsigma >0$,得到
+\begin{equation}
+    (\varsigma \mathbf{w})^\mathrm{T} \mathbf{x} + (\varsigma b)= 0
+\end{equation}
+令$\mathbf{w}' = \varsigma \mathbf{w}, \quad b' = \varsigma b$,
+
+使得距离划分超平面\textbf{最近}的点$ \mathbf{x}_s $ 到超平面的距离均为1，即
+\begin{equation}
+    \label{eq:距离划分超平面最近的点到超平面的距离为1}
+    \begin{cases}
+        \mathbf{w'}^\mathrm{T} \mathbf{x}_s + b' = 1, \quad if \quad y_i =1 \\
+        \mathbf{w'}^\mathrm{T} \mathbf{x}_s + b' = -1, \quad if \quad y_i =-1
+    \end{cases}
+\end{equation}
+
+\end{criticalSteps}
+
+那么\cref{eq:超平面进行决策的方法}变为
+
+\begin{equation}
+    \label{eq:超平面进行决策的方法2}
+    \begin{cases}
+        \mathbf{w'}^\mathrm{T} \mathbf{x_i} + b' \geq 1, \quad if \quad y_i =1 \\
+        \mathbf{w'}^\mathrm{T} \mathbf{x_i} + b' \leq -1, \quad if \quad y_i =-1
+    \end{cases}
+\end{equation}
+在后面的推导中，将$\mathbf{w'}$记为$\mathbf{w}$，$b'$记为$b$。
+
+
+由\cref{eq:超平面进行决策的方法2}可知，对于任意样本点$(\mathbf{x}_i,y_i)$,都有
+\begin{equation}
+    \label{eq:线性支持向量机的约束条件}
+    y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1, \quad i=1,2,\dots,m
+\end{equation}
+
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.6\textwidth]{硬间隔线性SVM.jpg} % 图片的文件名，不用加后缀！
+    \caption{线性支持向量机示意图}
+    \label{fig:硬间隔线性SVM}
+\end{figure}
+如\cref{fig:硬间隔线性SVM}所示，根据点到超平面的距离公式\cref{eq:点到超平面的距离}可知，两个异类支持向量到划分超平面的距离之和为
+
+\begin{align}
+    \label{eq:两个异类支持向量到划分超平面的距离之和}
+    l &=\frac{ \left| \mathbf{w}^\mathrm{T} \mathbf{x}_{s,\mathcal{C}_1} + b \right|}{\left\| \mathbf{w} \right\|} + \frac{ \left| \mathbf{w}^\mathrm{T} \mathbf{x}_{s,\mathcal{C}_2} + b \right|}{\left\| \mathbf{w} \right\|} \nonumber \\ 
+        &=\frac{ \left| 1 \right| }{\left\| \mathbf{w} \right\|} + \frac{ \left| -1 \right| }{\left\| \mathbf{w} \right\|} \nonumber \\
+        &= \frac{2}{\left\| \mathbf{w} \right\|}
+\end{align}
+
+
+综合\cref{eq:线性支持向量机的约束条件,eq:两个异类支持向量到划分超平面的距离之和}，前面的思路可以表述为以下优化问题
+\begin{equation}
+    \begin{aligned}
+    \label{eq:优化问题1}
+    &\max_{\mathbf{w},b} \quad \frac{2}{\left\| \mathbf{w} \right\|} \\    
+    & s.t. \quad y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1, \quad i=1,2,\dots,m
+    \end{aligned}
+\end{equation}
+
+\begin{criticalSteps}
+    {优化问题转化}
+    {}
+
+由于最大化$\frac{1}{\left\| \mathbf{w} \right\|} $ 等价于 最小化$\left\| \mathbf{w} \right\|^2 $
+
+因此，优化问题\cref{eq:优化问题1}等价于以下优化问题：
+
+\begin{equation}
+    \begin{aligned}
+    \label{eq:优化问题2}
+    &\min_{\mathbf{w},b} \quad \frac{1}{2}\left\| \mathbf{w} \right\|^2 \\    
+    & s.t. \quad y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1, \quad i=1,2,\dots,m
+    \end{aligned}
+\end{equation}
+这就是线性支持向量机的原始优化问题。
+\end{criticalSteps}
+
+\subsubsection{对偶问题}
+一种方法是可以直接利用梯度下降法等优化方法求解优化问题\cref{eq:优化问题2}（原问题）。
+另一种方法是求解其对偶问题，这样会导出一些更好的性质。
+
+下面使用拉格朗日乘子法求解优化问题\cref{eq:优化问题2}。
+构造拉格朗日函数
+\begin{equation}
+    \label{eq:优化问题2的拉格朗日函数}
+    L(\mathbf{w},b,\bm{\alpha}) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + \sum_{i=1}^{m} \alpha_i \left[ 1 - y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \right]
+\end{equation}
+其中，$\bm{\alpha} = (\alpha_1, \alpha_2, \dots, \alpha_m)^\mathrm{T}$ 是拉格朗日乘子，且$\alpha_i \geq 0, i=1,2,\dots,m$。
+展开得：
+\begin{equation}
+    \label{eq:优化问题2的拉格朗日函数展开式}
+    L(\mathbf{w},b,\bm{\alpha}) = \frac{1}{2} \mathbf{w}^\mathrm{T}\mathbf{w} + \sum_{i=1}^{m} \alpha_i - \sum_{i=1}^{m} \alpha_i y_i \mathbf{w}^\mathrm{T} \mathbf{x}_i - \sum_{i=1}^{m} \alpha_i y_i b
+\end{equation}
+
+所以其对偶函数为
+\begin{equation}
+    \label{eq:优化问题2的对偶函数}
+    g(\bm{\alpha}) = \min_{\mathbf{w},b} L(\mathbf{w},b,\bm{\alpha})
+\end{equation}
+
+对$L(\mathbf{w},b,\bm{\alpha})$分别对$\mathbf{w}$和$b$求偏导，并令其为0，得：
+\begin{equation}
+    \label{eq:优化问题2的拉格朗日函数对w和b求导}
+    \begin{cases}
+        \frac{\partial L}{\partial \mathbf{w}} = \mathbf{w} - \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i = 0 \\
+        \frac{\partial L}{\partial b} = - \sum_{i=1}^{m} \alpha_i y_i = 0
+    \end{cases}
+\end{equation}
+解得
+\begin{equation}
+    \label{eq:优化问题2的拉格朗日函数对w和b求导解}
+    \begin{cases}
+        \mathbf{w} = \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i  \\
+        \sum_{i=1}^{m} \alpha_i y_i = 0
+    \end{cases}
+\end{equation}
+将\cref{eq:优化问题2的拉格朗日函数对w和b求导解}代入\cref{eq:优化问题2的拉格朗日函数展开式}，得
+\begin{align}
+    \label{eq:优化问题2的对偶函数展开式}
+    g(\bm{\alpha}) 
+    &= \min_{\mathbf{w},b} L(\mathbf{w},b,\bm{\alpha}) \nonumber \\
+    &= \frac{1}{2} \left( \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i \right)^\mathrm{T} \left( \sum_{j=1}^{m} \alpha_j y_j \mathbf{x}_j \right) + \sum_{i=1}^{m} \alpha_i - \sum_{i=1}^{m} \alpha_i y_i \left( \sum_{j=1}^{m} \alpha_j y_j \mathbf{x}_j^\mathrm{T} \right) \mathbf{x}_i - 0 \cdot b \nonumber \\
+    &= \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x_i}^\mathrm{T} \mathbf{x_j} + \sum_{i=1}^{m} \alpha_i - \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x_i}^\mathrm{T} \mathbf{x_j} \nonumber \\
+    &= \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j
+\end{align}
+
+\textbf{注解：}在\cref{eq:优化问题2的对偶函数展开式}的推导中，
+$$
+\left( \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i \right)^\mathrm{T} \left( \sum_{j=1}^{m} \alpha_j y_j \mathbf{x}_j \right) 
+= \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x_i}^\mathrm{T} \mathbf{x_j}
+$$
+当$m=2$时，就是下面这样展开
+$$
+(a_1 \mathbf{x}_1 + a_2 \mathbf{x}_2)^\mathrm{T} (a_1 \mathbf{x}_1) + a_2 \mathbf{x}^\mathrm{T}
+= a_1^2 \mathbf{x}_1^\mathrm{T} \mathbf{x}_1 + a_1 a_2 \mathbf{x}_1^\mathrm{T} \mathbf{x}_2 + a_2 a_1 \mathbf{x}_2^\mathrm{T} \mathbf{x}_1 + a_2^2 \mathbf{x}_2^\mathrm{T} \mathbf{x}_2 
+$$
+
+\begin{criticalSteps}
+    {转化成对偶问题}
+    {}
+根据对偶问题的定义，结合\cref{eq:优化问题2的对偶函数展开式}，优化问题\cref{eq:优化问题2}的对偶问题为
+\begin{align}
+    \label{eq:优化问题2的对偶问题}
+    & \max_{\bm{\alpha}} g(\bm{\alpha}) = \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j \\
+    & s.t. \quad \begin{cases}
+        \alpha_i \geq 0, \quad i=1,2,\dots,m \\
+        \sum_{i=1}^{m} \alpha_i y_i = 0
+    \end{cases}
+\end{align}
+
+\end{criticalSteps}
+
+\subsubsection{模型求解与结果}
+在求解出最优拉格朗日乘子$\bm{\alpha}^*$后，可以利用\cref{eq:优化问题2的拉格朗日函数对w和b求导解}求解出最优参数$\mathbf{w}^*$
+\begin{equation}
+    \label{eq:线性支持向量机的最优参数w}
+    \mathbf{w}^* = \sum_{i=1}^{m} \alpha_i^* y_i \mathbf{x}_i
+\end{equation}
+
+考虑所有在间隔边界上的样本（即支持向量）${\mathbf{x}_s, y_s}$，在理想情况下，他们全都被正确分类，那么它们满足
+\begin{equation*}
+    \begin{cases}
+        \mathbf{w}^\mathrm{T} \mathbf{x}_s + b = 1\quad and \quad y_s=1, & if \mathbf{x}_s \in \mathcal{C}_1 \\
+        \mathbf{w}^\mathrm{T} \mathbf{x}_s + b = -1 \quad and \quad y_s=-1, & if \mathbf{x}_s \in \mathcal{C}_2
+    \end{cases}
+\end{equation*}
+
+那么
+$$
+y_s = \mathbf{w}^\mathrm{T} \mathbf{x}_s + b
+$$
+
+因此，可以求解出偏置$b^*$
+$$
+b^* = y_s - (\mathbf{w}^*)^\mathrm{T} \mathbf{x}_s
+$$
+
+显然，支持向量不止一个，记支持向量集合为$S$,支持向量的个数就为$|S|$，那么可以得到$|S|$个$b$的值。
+
+为了提高模型的鲁棒性，可以取所有支持向量的平均值作为$b^*$
+\begin{align}
+    \label{eq:线性支持向量机的最优参数b}
+    b^* &= \frac{1}{ |S| } \sum_{\mathbf{x}_s \in S} (y_s - (\mathbf{w}^*)^\mathrm{T} \mathbf{x}_s) \nonumber \\
+        &= \frac{1}{ |S| } \sum_{\mathbf{x}_s \in S} (y_s - \sum_{i=1}^{m} \alpha_i^* y_i \mathbf{x}_i^\mathrm{T} \mathbf{x}_s)
+\end{align}
+
+所以求得的决策边界为
+$$
+(\mathbf{w}^*)^\mathrm{T} \mathbf{x}_s + b^* = 0
+$$
+代入\cref{eq:线性支持向量机的最优参数w}，得其对偶形式
+$$
+\sum_{i=1}^{m} \alpha_i^* y_i \mathbf{x}_i^\mathrm{T} \mathbf{x} + b^* = 0
+$$
+
+那么，线性支持向量机分类器可以表示为：
+\begin{equation}
+    \label{eq:线性支持向量机分类器}
+    f(\mathbf{x}) = sign \left( (\mathbf{w}^*)^\mathrm{T} \mathbf{x} + b^* \right)
+\end{equation}
+代入\cref{eq:线性支持向量机的最优参数w}，得其对偶形式
+\begin{equation}
+    \label{eq:线性支持向量机分类器的对偶形式}
+    f(\mathbf{x}) = sign \left( \sum_{i=1}^{m} \alpha_i^* y_i \mathbf{x}_i^\mathrm{T} \mathbf{x} + b^* \right)
+\end{equation}
+
+\begin{criticalSteps}
+    {KKT条件}
+    {}
+在求解优化问题\cref{eq:优化问题2}时，需要满足KKT条件:
+\begin{equation}
+    \label{eq:线性支持向量机的KKT条件}
+    \begin{cases}
+        \alpha_i \geq 0,\\
+        y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) - 1 \geq 0, \\
+        \alpha_i \left[ y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) - 1 \right] = 0
+    \end{cases}
+\end{equation}
+由最后1个条件（互补松弛条件）可知：
+当且仅当$y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) - 1 = 0$时，$\alpha_i \neq 0$，
+即只有支持向量对应的拉格朗日乘子$\alpha_i$才不等于0，其他样本点对应的拉格朗日乘子均为0。
+\end{criticalSteps}
+
+因此，如果采用对偶形式\cref{eq:线性支持向量机分类器的对偶形式}，
+则其最终的线性支持向量机分类器只与支持向量（即间隔边界上的点）有关，而与其他样本点无关，可表示为：
+\begin{equation}
+    \label{eq:线性支持向量机分类器的对偶形式只考虑支持向量}
+    f(\mathbf{x}) = sign \left( \sum_{\mathbf{x}_s \in S} \alpha_s^* y_s \mathbf{x}_s^\mathrm{T} \mathbf{x} + b^* \right)
+\end{equation}
+相比于\cref{eq:线性支持向量机分类器的对偶形式}，\cref{eq:线性支持向量机分类器的对偶形式只考虑支持向量}的计算量大大减小。
+
+至此，线性支持向量机分类器的推导与求解完毕。
+
+\subsubsection{线性支持向量机分类器的分析}
+观察线性支持向量机分类器的对偶形式\cref{eq:线性支持向量机分类器的对偶形式只考虑支持向量}
+可以发现：\\
+    线性支持向量机分类器中有一项是支持向量与待分类样本点的内积$\mathbf{x}_s^\mathrm{T} \mathbf{x}$，这其实是衡量两个向量之间的相似度。若内积越大，则两个向量越相似。
+
+\subsubsection{软间隔支持向量机}
+在前面的推导中，一直是假设数据集是线性可分的，但在实际问题中，数据集往往是线性不可分的，
+即使是线性可分的，也很难断定找到的线性分类器并没有过拟合。
+为了缓解过拟合的问题，一个方法是允许支持向量机模型在少量训练样本上出错，也就是由前面的“硬间隔”（要求全部训练样本都不能出错）变成“软间隔”，如\cref{fig:软间隔线性SVM}所示。
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.6\textwidth]{软间隔线性SVM.jpg} % 图片的文件名，不用加后缀！
+    \caption{软间隔支持向量机示意图}
+    \label{fig:软间隔线性SVM}
+\end{figure}
+
+软间隔支持向量机的原始优化问题
+\begin{equation}
+    \label{eq:软间隔支持向量机的原始优化问题}
+    \begin{aligned}
+        \min_{\mathbf{w},b,\bm{\xi}} \quad & \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i \\
+        s.t. \quad & y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1 - \xi_i, \quad i=1,\dots,m \\
+        & \xi_i \geq 0 , \quad i=1,\dots,m
+    \end{aligned}
+\end{equation}
+
+其中，$\xi_i$是松弛变量，表示第i个样本点违反约束条件的程度，$C>0$是惩罚参数，用于权衡间隔大小和违反约束条件的程度。
+
+Lagrange 函数为
+\begin{equation}
+    \label{eq:软间隔支持向量机的Lagrange函数}
+    \begin{aligned}
+    L(\mathbf{w},b,\bm{\xi},\bm{\alpha},\bm{\beta}) 
+    = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i
+    + \sum_{i=1}^{m} \alpha_i \left[1- \xi_i - y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \right] 
+    - \sum_{i=1}^{m} \beta_i \xi_i
+    \end{aligned}
+\end{equation}
+
+对偶函数就是
+\begin{align}
+    \label{eq:软间隔支持向量机的对偶函数形式}
+    g(\bm{\alpha},\bm{\beta}) 
+    =& \inf_{\mathbf{w},b,\bm{\xi}} L(\mathbf{w},b,\bm{\xi},\bm{\alpha},\bm{\beta}) \\
+    =& \inf_{\mathbf{w},b,\bm{\xi}} \{ \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i
+    + \sum_{i=1}^{m} \alpha_i \left[1- \xi_i - y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \right] 
+    - \sum_{i=1}^{m} \beta_i \xi_i \}
+\end{align}
+
+为了求出Larange 函数的下界，需要求解Lagrange 函数关于$\mathbf{w},b,\bm{\xi}$的梯度：
+\begin{align}
+    \label{eq:软间隔支持向量机的Lagrange函数梯度}
+    \frac{\partial L}{\partial \mathbf{w}} &= \mathbf{w} - \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i \\
+    \frac{\partial L}{\partial b} &= \sum_{i=1}^{m} \alpha_i y_i \\
+    \frac{\partial L}{\partial \xi_i} &= C - \alpha_i - \beta_i, \quad i=1,2,\dots,m
+\end{align}
+令它们都等于0，得
+\begin{align}
+    & \mathbf{w} = \sum_{i=1}^{m} \alpha_i y_i \mathbf{x}_i \\
+    & \sum_{i=1}^{m} \alpha_i y_i = 0 \\
+    & C - \alpha_i - \beta_i = 0, \quad i=1,2,\dots,m
+\end{align}
+
+将以上结果代入\cref{eq:软间隔支持向量机的对偶函数形式},得
+\begin{equation}
+    \label{eq:软间隔支持向量机的对偶函数}
+    g(\bm{\alpha}) 
+    = \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j
+\end{equation}
+注意：这时的$\bm{\beta}$已经被消去，所以对偶函数只与$\bm{\alpha}$有关。
+
+因此，软间隔支持向量机的对偶问题为
+
+\begin{equation}
+    \label{eq:软间隔支持向量机的对偶问题初始表达形式}
+    \begin{aligned}
+        \max_{\bm{\alpha}} \quad & g(\bm{\alpha}) = \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j \\
+        s.t. \quad & \sum_{i=1}^{m} \alpha_i y_i = 0 \\
+        & \alpha_i \geq 0, \quad i=1,2,\dots,m \\
+        & \beta_i \geq 0, \quad i=1,2,\dots,m  \\
+    \end{aligned}
+\end{equation}
+
+由于$ \beta_i = C - \alpha_i $，所以$ \beta_i \geq 0 $等价于$ \alpha_i \leq C $。
+因此，软间隔支持向量机的对偶问题最终表达形式为
+\begin{equation}
+    \label{eq:软间隔支持向量机的对偶问题最终表达形式}
+    \begin{aligned}
+        \max_{\bm{\alpha}} \quad & g(\bm{\alpha}) = \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j \\
+        s.t. \quad & \sum_{i=1}^{m} \alpha_i y_i = 0 \\
+        & 0 \leq \alpha_i \leq C, \quad i=1,2,\dots,m
+    \end{aligned}
+\end{equation}
+
+下面通过对比“硬间隔支持向量机”和“软间隔支持向量机”来说明软间隔支持向量机的原理与推导公式。
+\vspace{0.01\textwidth} % 一点间距
+
+% 定义两列（宽度总和需小于 \textwidth）
+\noindent
+\begin{minipage}[t]{0.48\textwidth} % 左列（占48%宽度）
+    \centering % 让minipage内部的内容居中
+    \textbf{硬间隔支持向量机}
+
+    \textbf{约束条件}
+
+    每个样本点$(\mathbf{x}_i,y_i),\quad i=1,2,\dots,m $，都要严格地分类正确，即
+    $$
+    y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1, \quad i=1,2,\dots,m
+    $$
+
+    \textbf{原问题}
+    \begin{align*}
+        \min_{\mathbf{w},b} \quad & \frac{1}{2}\left\| \mathbf{w} \right\|^2 \\
+        s.t. \quad & y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1, \quad i=1,\dots,m    
+    \end{align*}
+    
+    \textbf{对偶问题}
+    \begin{align*}
+        & \max_{\bm{\alpha}} \quad \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j \\
+        s.t. \quad & \alpha_i \geq 0, \quad i=1,\dots,m \\
+                    & \sum_{i=1}^{m} \alpha_i y_i = 0
+    \end{align*}
+
+    \textbf{所得分类器}
+    \begin{equation*}
+        f(\mathbf{x}) = sign \left( \sum_{\mathbf{x}_s \in S} \alpha_s^* y_s \mathbf{x}_s^\mathrm{T} \mathbf{x} + b^* \right)
+    \end{equation*}
+    只有在间隔边界上的点（即支持向量）所对应的$\alpha_s^* \neq 0$。
+\end{minipage}
+\hspace{0.01\textwidth} % 一点间距
+\vrule width 0.5pt % 0.5pt宽的垂直线
+\hspace{0.01\textwidth} % 一点间距
+\begin{minipage}[t]{0.48\textwidth} % 右列（占48%宽度）
+    \centering % 让minipage内部的内容居中
+    \textbf{软间隔支持向量机}
+
+    \textbf{约束条件}
+
+    对于每个样本点$(\mathbf{x}_i,y_i),\quad i=1,2,\dots,m $，引入\textbf{松弛变量}$\xi_i \geq 0$，使得约束条件变为
+    \begin{equation}
+        \label{eq:软间隔支持向量机的约束条件}
+        \begin{cases}
+            y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1 - \xi_i\\
+            \xi_i > 0 
+        \end{cases}
+        i=1,\dots,m    
+    \end{equation}
+
+    \textbf{原问题}
+    \begin{align}
+        \label{eq:软间隔支持向量机的优化问题}
+        \min_{\mathbf{w},b,\bm{\xi}} \quad & \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i \nonumber \\
+        s.t. \quad  & y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1 - \xi_i,\quad i=1,\dots,m \nonumber\\
+                    & \xi_i > 0 ,\quad i=1,\dots,m   
+    \end{align}
+    
+    \textbf{对偶问题}
+    \begin{align}
+        \label{eq:软间隔支持向量机的对偶问题}
+        \max_{\bm{\alpha}} \quad & \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \mathbf{x}_i^\mathrm{T} \mathbf{x}_j \nonumber \\
+        s.t. \quad & \alpha_i \geq 0, \quad i=1,\dots,m \nonumber \\
+                & \alpha_i \leq C, \quad i=1,\dots,m \nonumber \\
+                & \sum_{i=1}^{m} \alpha_i y_i = 0
+    \end{align}
+
+    \textbf{所得分类器}
+    \begin{equation}
+        \label{eq:软间隔支持向量机的分类器}
+        f(\mathbf{x}) = sign \left( \sum_{i=1}^{m} \alpha_i^* y_i \mathbf{x}_i^\mathrm{T} \mathbf{x} + b^* \right)
+    \end{equation}
+    只有在间隔边界\textbf{内}的点所对应的$\alpha_i^* \neq 0$。
+\end{minipage}
+\vspace{0.02\textwidth} % 一点间距
+
+\subsection{非线性支持向量机}
+在实际问题中，数据集往往是线性不可分的，可以考虑使用基函数$\bm{\phi}(\mathbf{x})$来替代原始输入向量$\mathbf{x}$，将其映射到高维特征空间中，
+使得在高维特征空间中数据集是线性可分的，从而使用线性支持向量机进行分类。
+
+\subsubsection{非线性支持向量机的优化问题与求解}
+下面直接推导带有软间隔的非线性支持向量机。如果想要得到带有硬间隔的非线性支持向量机，只需将松弛变量$\xi_i$去掉即可。
+
+软间隔的非线性支持向量机对应的优化问题是
+\begin{align}
+    \label{eq:非线性支持向量机的优化问题}
+    & \min_{\mathbf{w},b} \quad \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i \\
+    s.t. \quad & y_i(\mathbf{w}^\mathrm{T} \bm{\phi}(\mathbf{x}_i) + b) \geq 1-\xi_i, \quad i=1,2,\dots,m \\
+    & \xi_i \geq 0, \quad i=1,2,\dots,m
+\end{align}
+
+其对偶问题为
+\begin{align}
+    \label{eq:非线性支持向量机的对偶问题}
+    \max_{\bm{\alpha}} \quad & \sum_{i=1}^{m} \alpha_i - \frac{1}{2} \sum_{i=1}^{m} \sum_{j=1}^{m} \alpha_i \alpha_j y_i y_j \bm{\phi}(\mathbf{x}_i)^\mathrm{T} \bm{\phi}(\mathbf{x}_j)  \\
+    s.t. \quad & \alpha_i \geq 0, \quad i=1,\dots,m \\
+            & \alpha_i \leq C, \quad i=1,\dots,m \\
+            & \sum_{i=1}^{m} \alpha_i y_i = 0
+\end{align}
+
+所得分类器
+\begin{equation}
+    \label{eq:非线性支持向量机的分类器}
+    f(\mathbf{x}) = sign \left( \sum_{i=1}^{m} \alpha_i^* y_i \bm{\phi}(\mathbf{x}_i)^\mathrm{T} \bm{\phi}(\mathbf{x}) + b^* \right)
+\end{equation}
+考虑到$\bm{\phi}(\mathbf{x}_i)^\mathrm{T} \bm{\phi}(\mathbf{x})$计算量比较大，引入核函数来简化计算。
+
+定义核函数为
+\begin{equation}
+    \label{eq:核函数定义}
+    \kappa (\mathbf{x}_i,\mathbf{x}_j) = \bm{\phi}(\mathbf{x}_i)^\mathrm{T} \bm{\phi}(\mathbf{x}_j)
+\end{equation}
+\textbf{注解：}
+核函数实际上是计算两个向量在高维特征空间中的内积，得到的是一个标量，利用这个标量来替代原来的高维向量内积，能够大大降低计算复杂度。
+
+代入核函数\cref{eq:核函数定义}，非线性支持向量机分类器可以表示为
+\begin{equation}
+    \label{eq:非线性支持向量机的分类器代入核函数}
+    f(\mathbf{x}) = sign \left( \sum_{i=1}^{m} \alpha_i^* y_i \kappa (\mathbf{x}_i,\mathbf{x}_j) + b^* \right)
+\end{equation}
+
+\subsubsection{常用核函数}
+常用核函数的表达式与其特点比较如\cref{tab:常用核函数}所示：
+\begin{table}[!htbp]
+    \caption{常用核函数}\label{tab:常用核函数} \centering
+    \begin{tabular}{cccc} % 选择对齐方式：c:居中，l:左，r:右
+        \toprule[1.5pt] %表格最上面的线的线宽
+        名称 & 表达式 & 参数 & 特点 \\
+        \midrule[1pt] %表格最中间的线的线宽
+        线性核 (Linear)       & $ \kappa(\mathbf{x}_i, \mathbf{x}_j) = \mathbf{x}_i^T \mathbf{x}_j $ & 无 & 只能处理线性问题\\
+        多项式核 (Polynomial) & $ \kappa(\mathbf{x}_i, \mathbf{x}_j) = (\mathbf{x}_i^T \mathbf{x}_j)^d $ & d & 能处理非线性问题，但对参数d比较敏感 \\
+        高斯核 (RBF)          & $ \kappa(\mathbf{x}_i, \mathbf{x}_j) = e^{\frac{\left\| \mathbf{x}_i - \mathbf{x}_j \right\|^2}{2 \sigma^2}} $  & $\sigma$ & 处理高度非线性问题，表现最稳定\\
+        Sigmoid核             & $ \kappa(\mathbf{x}_i, \mathbf{x}_j) = \tanh (\beta \mathbf{x}_i^T \mathbf{x}_j + \theta)$ & $\beta, \theta $ & {能处理非线性问题，但对参数和数据分布敏感，性能不稳定} \\ 
+        \bottomrule[1.5pt] %表格最下面的线的线宽
+    \end{tabular}
+\end{table}
+
+简而言之，线性核只适用于线性问题，而其他核函数都使用于非线性问题。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{线性分类器的损失函数及其优化函数}
+\subsection{常见线性分类器的损失函数}
+\subsubsection{支持向量机的损失函数}
+硬间隔支持向量机的优化函数为
+$$
+J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2
+$$
+如果允许有部分样本点分类错误，并且考虑这些被错误分类的样本点数带来的影响，这个影响可以利用0/1损失函数来衡量：
+\begin{equation}
+    L_{0/1}(z) = 
+    \begin{cases}
+        0, & if \quad z \geq 0 \\
+        1, & if \quad z < 0
+    \end{cases}
+\end{equation}
+那么，优化函数可以写为
+\begin{equation}
+    \label{eq:使用0/1损失函数的优化函数}
+J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{0/1}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)-1)
+\end{equation}
+
+回顾软间隔支持向量机的优化问题：
+\begin{align*}
+    \min_{\mathbf{w},b,\bm{\xi}} \quad & \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} \xi_i \nonumber \\
+    s.t. \quad  & y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) \geq 1 - \xi_i,\quad i=1,\dots,m \nonumber\\
+                & \xi_i > 0 ,\quad i=1,\dots,m   
+\end{align*}
+不难发现，松弛变量$\xi_i$可以表示为：
+\begin{equation}
+    \label{eq:松弛变量xi的表示}
+    \xi_i = max(0, 1 - y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+\end{equation}
+
+定义hinge损失函数为：
+\begin{equation}
+    L_{hinge}(z) = max(0, 1 - z)
+\end{equation}
+利用hinge损失函数,\cref{eq:松弛变量xi的表示}可以表示为：
+\begin{equation}
+    \label{eq:松弛变量xi用hinge损失函数表示}
+    \xi_i = L_{hinge}( y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+\end{equation}
+将\cref{eq:松弛变量xi用hinge损失函数表示}代入软间隔支持向量机的优化函数，得到：
+\begin{equation}
+    \label{eq:使用hinge损失函数的优化函数}
+J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{hinge}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+\end{equation}
+
+\subsubsection{logistics回归的损失函数}
+logistics回归中本质上就是采用了对数损失函数：
+
+在logistics回归中，假设样本点$(\mathbf{x}_i,y_i)$，则优化函数可以表示为
+\begin{equation}
+    \label{eq:logistics回归的优化函数}
+    J(\mathbf{w},b) =-\sum_{i=1}^{m} \left ( \tilde{y}_i ln(\sigma (\mathbf{w}^\mathrm{T} \mathbf{x}_i +b)) + (1-\tilde{y}_i) ln(\sigma (\mathbf{w}^\mathrm{T} \mathbf{x}_i +b)) \right ) + \frac{\lambda}{2} \left\| \mathbf{w} \right\|^2 
+\end{equation}
+其中，
+$
+\sigma (h) = \frac{1}{1+e^{-h}}
+$
+是sigmoid函数，$\tilde{y}_i \in \{0,1\}$是样本点的标签，
+$
+\frac{\lambda}{2} \left\| \mathbf{w} \right\|^2 
+$是正则化项。
+
+定义$y_i \in \{-1,1\}$，它与$\tilde{y}_i$的关系为
+\begin{equation}
+    \label{eq:yi和tilde_yi的关系}
+    \begin{cases}
+        y_i = 1, & if \quad \tilde{y}_i = 1 \\
+        y_i = -1, & if \quad \tilde{y}_i = 0
+    \end{cases}
+\end{equation}
+
+并且引入对数损失函数：
+\begin{equation}
+    L_{log}(z) = ln(1 + e^{-z})
+\end{equation}
+
+则logistics回归的优化函数\cref{eq:logistics回归的优化函数}等价于
+\begin{align}
+    \label{eq:logistics回归的优化函数2}
+    J(\mathbf{w},b) &= \sum_{i=1}^{m} ln(1 + e^{-y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)}) + \frac{\lambda}{2} \left\| \mathbf{w} \right\|^2 \\
+                    &= \sum_{i=1}^{m} L_{log}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)) + \frac{\lambda}{2} \left\| \mathbf{w} \right\|^2
+\end{align}
+
+\subsubsection{常见损失函数总结}
+常见的损失函数总结如下：
+\begin{itemize}
+    
+    \item 0/1损失函数:
+    \begin{equation}
+        \label{eq:0/1损失函数}
+        L_{0/1}(z) = 
+        \begin{cases}
+            0, & \quad z \geq 0 \\
+            1, & \quad z < 0
+        \end{cases}
+    \end{equation}
+
+    梯度函数:不存在梯度。
+
+    \item hinge损失函数:
+    \begin{equation}
+        \label{eq:hinge损失函数}
+        L_{hinge}(z) = max(0, 1 - z)
+    \end{equation}
+
+    梯度函数:
+    \begin{equation}
+        \label{eq:hinge损失函数的梯度函数}
+        \frac{\partial L_{hinge}(z)}{\partial z} = 
+        \begin{cases}
+            -1, & \quad z < 1 \\
+            0, & \quad z \geq 1
+        \end{cases}
+    \end{equation}
+
+    \item 对数损失函数：
+    \begin{equation}
+        \label{eq:对数损失函数}
+        L_{log}(z) = ln(1 + e^{-z})
+    \end{equation}
+
+    梯度函数:
+    \begin{equation}
+        \label{eq:对数损失函数的梯度函数}
+        \frac{\partial L_{log}(z)}{\partial z} = 
+        -\frac{1}{1+e^{z}}
+    \end{equation}
+
+    \item 指数损失函数：
+    \begin{equation}
+        \label{eq:指数损失函数}
+        L_{exp}(z) = e^{-z}
+    \end{equation}
+
+    梯度函数:
+    \begin{equation}
+        \label{eq:指数损失函数的梯度函数}
+        \frac{\partial L_{exp}(z)}{\partial z} =
+        -e^{-z}
+    \end{equation}
+
+\end{itemize}
+
+\subsection{线性分类器的优化函数一般形式}
+由前面的优化函数\cref{eq:使用0/1损失函数的优化函数,eq:使用hinge损失函数的优化函数,eq:logistics回归的优化函数2} 可以发现，分类器的优化函数具有以下共同形式:
+
+\begin{equation}
+    \label{eq:分类器优化函数的共同形式}
+    \min_{\mathbf{w},b} \quad \Omega(h) + C \sum_{i=1}^{m} L(y_i, h(\mathbf{x}_i))
+\end{equation}
+其中，$h$为分类器的函数。
+
+$\Omega(h)$可以理解为结构风险，描述模型本身的性质；也可以理解为正则化项，降低模型过拟合的风险。
+
+$L(y_i, h(\mathbf{x}_i))$为经验风险，描述模型与训练数据的契合程度，可以取前文所介绍的各种损失函数。
+
+C 是权重，用来平衡结构风险与经验风险在优化函数中的重要性。
+
+\subsubsection{常见优化函数总结}
+将常见的损失函数代入线性分类器的优化函数\cref{eq:分类器优化函数的共同形式}，得到常见的优化函数如下：
+
+\begin{itemize}
+    
+    \item 0/1损失函数的优化函数:
+    \begin{equation}
+        \label{eq:0/1损失函数的优化函数}
+        J \left ( \mathbf{w},b \right ) = \frac{1}{2} \left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{0/1}(y_i (\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)-1)
+    \end{equation}
+
+    梯度函数:不存在梯度。
+
+    \item hinge损失函数的优化函数:
+    \begin{equation}
+        \label{eq:hinge损失函数的优化函数}
+        J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{hinge}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+    \end{equation}
+
+    梯度函数:
+    \begin{align}
+        \label{eq:hinge损失函数的优化函数的梯度函数}
+        \frac{\partial J}{\partial \mathbf{w}} &= 
+        \mathbf{w} + C \sum_{i=1}^{m}
+        \begin{cases}
+            -y_i \mathbf{x}_i, & \quad y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) < 1 \\
+            0, & \quad otherwise
+        \end{cases} \\
+        \frac{\partial J}{\partial b} &= 
+        C \sum_{i=1}^{m}
+        \begin{cases}
+            -y_i, & \quad y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b) < 1 \\
+            0, & \quad otherwise
+        \end{cases}
+    \end{align}
+
+    \item 对数损失函数的优化函数：
+    \begin{equation}
+        \label{eq:对数损失函数的优化函数}
+        J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{log}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+    \end{equation}
+
+    梯度函数:
+    \begin{align}
+        \label{eq:对数损失函数的优化函数的梯度函数}
+        \frac{\partial J}{\partial \mathbf{w}} &= 
+        \mathbf{w} + C \sum_{i=1}^{m} \frac{(-y_i \mathbf{x}_i)}{1+e^{y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)}} \\
+        \frac{\partial J}{\partial b} &= 
+        C \sum_{i=1}^{m} \frac{-y_i}{1+e^{y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)}}
+    \end{align}
+
+    \item 指数损失函数的优化函数：
+    \begin{equation}
+        \label{eq:指数损失函数的优化函数}
+        J(\mathbf{w},b) = \frac{1}{2}\left\| \mathbf{w} \right\|^2 + C \sum_{i=1}^{m} L_{exp}(y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b))
+    \end{equation}
+
+    梯度函数:
+    \begin{align}
+        \label{eq:指数损失函数的优化函数的梯度函数}
+        \frac{\partial J}{\partial \mathbf{w}} &= 
+        \mathbf{w} + C \sum_{i=1}^{m}(-y_i \mathbf{x}_i) e^{-y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)}\\
+        \frac{\partial J}{\partial b} &= 
+        C \sum_{i=1}^{m}(-y_i) e^{-y_i(\mathbf{w}^\mathrm{T} \mathbf{x}_i + b)}
+    \end{align}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{训练方法与技巧}
+训练模型的一种常用方法是：梯度下降法。
+\subsection{梯度下降法}
+梯度下降法的基本思想是：沿着目标函数梯度的反方向更新参数，从而使目标函数值逐步减小，最终达到最小值。
+假设学习率为$\eta$，则利用梯度下降法更新任意参数$\bm{\theta}$的公式为:
+\begin{equation}
+    \label{eq:梯度下降法的参数更新公式}
+    \bm{\theta}_{t+1} =  \bm{\theta}_t - \eta \nabla f (\bm{\theta}_t) \\
+\end{equation}
+
+如果只选取\textbf{一个}样本点来计算梯度，则称为随机梯度下降法（SGD）；
+如果选取\textbf{全部}样本点来计算梯度，则称为批量梯度下降法（BGD）；
+如果选取\textbf{部分}样本点来计算梯度，则称为小批量梯度下降法（MBGD）。
+
+\subsection{动量梯度下降法}
+为了避免陷入局部最优，并且加快收敛速率，可以在梯度下降法的基础上引入动量项。
+假设动量项为$\mathbf{v}$，动量衰减率为$\rho$，则利用动量梯度下降法更新任意参数$\bm{\theta}$的公式为:
+\begin{align}
+    \label{eq:动量梯度下降法的参数更新公式}
+    \mathbf{v}_{t} &= \rho \mathbf{v}_{t-1} + \nabla f (\bm{\theta}_{t-1}) \\
+    \bm{\theta}_{t+1} &=  \bm{\theta}_t - \eta \mathbf{v}_{t}
+\end{align}
+
+\subsection{RMSProp}
+
+利用RMSProp更新任意参数$\bm{\theta}$的公式为:
+\begin{align}
+    \label{eq:RMSProp的参数更新公式}
+    \mathbf{s}_{t} &= \rho \mathbf{s}_{t-1} + (1-\rho) \left\| \nabla f (\bm{\theta}_{t-1}) \right\| ^2 \\
+    \bm{\theta}_{t+1} &=  \bm{\theta}_t - \eta \nabla f (\bm{\theta}_t) \oslash  \sqrt{\mathbf{s}_{t} + \epsilon}
+\end{align}
+其中，$ \oslash $是逐个元素除法，$\epsilon$是一个很小的常数，防止分母为0。
+
+\subsection{Adam}
+Adam（Adaptive Moment Estimation）结合了动量法（Momentum）和 RMSProp 的思想，
+旨在通过计算梯度的一阶矩估计和二阶矩估计来调整每个参数的学习率，从而实现自适应的参数更新。
+
+首先计算梯度的一阶矩估计（动量项）和二阶矩估计：
+\begin{align}
+    \mathbf{m}_{t} &= \beta_1 \mathbf{m}_{t-1} + (1-\beta_1) \nabla f (\bm{\theta}_{t-1}) \\
+    \mathbf{s}_{t} &= \beta_2 \mathbf{s}_{t-1} + (1-\beta_2) \left\| \nabla f (\bm{\theta}_{t-1}) \right\| ^2
+\end{align}
+
+由于初始时刻的$\mathbf{m}_0$和$\mathbf{s}_0$均为0，导致在前几次迭代中，$\mathbf{m}_t$和$\mathbf{s}_t$会有偏差。
+为了纠正这种偏差，引入偏差修正：
+\begin{align}
+    \hat{\mathbf{m}}_{t} &= \frac{\mathbf{m}_{t}}{1-\beta_1^t} \\
+    \hat{\mathbf{s}}_{t} &= \frac{\mathbf{s}_{t}}{1-\beta_2^t}
+\end{align}
+最后，利用修正后的矩估计来更新参数：
+\begin{equation}
+    \bm{\theta}_{t+1} =  \bm{\theta}_t - \eta \hat{\mathbf{m}}_{t} \oslash  \sqrt{\hat{\mathbf{s}}_{t} + \epsilon}
+\end{equation}
+其中，$ \oslash $是逐个元素除法，$\epsilon$是一个很小的常数，防止分母为0。
+
+综上，利用Adam更新任意参数$\bm{\theta}$的公式为:
+\begin{align}
+    \label{eq:Adam的参数更新公式}
+    \mathbf{m}_{t} &= \beta_1 \mathbf{m}_{t-1} + (1-\beta_1) \nabla f (\bm{\theta}_{t-1}) \\
+    \mathbf{s}_{t} &= \beta_2 \mathbf{s}_{t-1} + (1-\beta_2) \left\| \nabla f (\bm{\theta}_{t-1}) \right\| ^2 \\
+    \hat{\mathbf{m}}_{t} &= \frac{\mathbf{m}_{t}}{1-\beta_1^t} \\
+    \hat{\mathbf{s}}_{t} &= \frac{\mathbf{s}_{t}}{1-\beta_2^t} \\
+    \bm{\theta}_{t+1} &=  \bm{\theta}_t - \eta \hat{\mathbf{m}}_{t} \oslash  \sqrt{\hat{\mathbf{s}}_{t} + \epsilon}
+\end{align}
+
+默认情况下，一般将参数设置为：
+$\beta_1 = 0.9,\quad \beta_2 = 0.999,\quad \epsilon = 10^{-8},\quad \eta = 0.001$。
+
+特别地，当$\beta_1 = 0$时，Adam退化为RMSProp；当$\beta_2 = 0$时，Adam退化为动量梯度下降法。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{卷积神经网络}
+卷积神经网络（Convolutional Neural Network，CNN）是一种用于处理图像数据的神经网络。
+
+卷积神经网络主要分为两部分，一部分为卷积部分，另一部分为全连接部分。
+
+卷积部分主要用于提取图像中的特征，它由卷积核、归一化层、激活层和池化层组成。
+其中归一化层和池化层是可选的。
+
+而全连接部分则用于分类，其结构与神经网络相同。
+
+一层简单但完整的卷积神经网络结构如\cref{fig:一层简单但完整的卷积神经网络}所示。
+\begin{figure}[!h]
+    \centering % 图片居中
+    \includegraphics[width=.8\textwidth]{一层简单但完整的卷积神经网络.jpg} % 图片的文件名，不用加后缀！
+    \caption{一层简单但完整的卷积神经网络}
+    \label{fig:一层简单但完整的卷积神经网络}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{聚类分析}
+聚类分析（Clustering）是一种无监督学习方法，用于将数据集划分为几个子集，称为“簇”，
+使得每个簇内的数据点相似度高，而簇间的数据点相似度低。
+
+\subsection{K-Means}
+K-Means 是一种经典的无监督学习算法，用于将数据集划分为 
+$K$ 个簇（clusters）。其目标是最小化簇内样本与簇中心之间的平方距离，
+属于原型（prototype-based）聚类方法。
+
+\subsubsection{问题定义}
+给定数据集：
+\begin{equation*}
+    X = \{\mathbf{x}^{(1)}, \mathbf{x}^{(2)}, \ldots, \mathbf{x}^{(N)}\}, \mathbf{x}^{(n)} \in \mathbb{R}^d
+\end{equation*}
+我们希望将数据划分为 
+$K$个簇，并为每个簇找到一个中心（centroid）：
+\begin{equation*}
+    \bm{\mu}_k \in \mathbb{R}^d, k = 1, 2, \ldots, K
+\end{equation*}
+
+K-Means的优化目标是最小化总的簇内平方误差（Within-Cluster Sum of Squares，WCSS）：
+\begin{equation}
+    \label{eq:K-Means的优化目标}
+    J = \sum_{k=1}^{K} \sum_{n=1}^{N} \gamma_{nk} \| \mathbf{x}^{(n)} - \bm{\mu}_k \|^2
+\end{equation}
+其中，$\gamma_{nk}$为簇指示变量,表示样本$\mathbf{x}^{(n)}$是否属于簇$k$。
+\begin{equation}
+    \label{eq:gamma_nk}
+    \gamma_{nk} = 
+    \begin{cases}
+        1, & \text{if } n \text{ belongs to cluster } k \\
+        0, & \text{otherwise}
+    \end{cases}
+\end{equation}
+那么$\gamma_{n1}, \gamma_{n2}, \ldots, \gamma_{nK}$就构成一个独热向量，表示样本$\mathbf{x}^{(n)}$属于哪一个簇。
+$$
+\bm{\gamma}_n =\begin{bmatrix}
+    \gamma_{n1}, \gamma_{n2}, \ldots, \gamma_{nK}
+\end{bmatrix}^\mathrm{T} 
+$$
+
+\subsubsection{算法思想}
+\textbf{Step1:簇分配（Assignment Step）}
+将每个样本分配给最近的簇中心：
+\begin{align}
+    \label{eq:KMeans_Assignment_Step}
+    \gamma_{nk} &= 
+    \begin{cases}
+        1, & k = \arg \min_{j} \| \mathbf{x}^{(n)} - \bm{\mu}_j \|^2 \\
+        0, & \text{otherwise}
+    \end{cases}
+\end{align}
+
+\textbf{Step2:更新簇中心（Update Step）}
+根据新的簇分配，更新簇中心，其实就是求出每个簇内样本点的均值作为新的簇中心：
+\begin{equation}
+    \label{eq:KMeans_Update_Step}
+    \bm{\mu}_k = \frac{\sum_{n=1}^{N} \gamma_{nk} \mathbf{x}^{(n)}}{\sum_{n=1}^{N} \gamma_{nk}}
+\end{equation}
+
+\subsubsection{算法流程}
+
+\begin{algorithm}
+    \caption{K-Means Algorithm}
+    \begin{algorithmic}[1]
+        \REQUIRE Dataset $X = \{x^{(1)}, \ldots, x^{(N)}\}$, number of clusters $K$
+        \ENSURE Centroids $\{\mu_1, \ldots, \mu_K\}$
+        
+        \STATE Randomly initialize $K$ centroids $\mu_k$
+        \REPEAT
+            \STATE \textbf{(Assignment Step)} For each sample $x^{(n)}$, determine its cluster label:
+            \[
+                r_{nk} =
+                \begin{cases}
+                    1, & k = \arg\min_j \| x^{(n)} - \mu_j \|^2 \\
+                    0, & \text{otherwise}
+                \end{cases}
+            \]
+            
+            \STATE \textbf{(Update Step)} Update each centroids:
+            \[
+                \mu_k = \frac{\sum_{n=1}^N r_{nk} x^{(n)}}{\sum_{n=1}^N r_{nk}}
+            \]
+            
+        \UNTIL{Centroids stop changing or the objective function converges}
+    \end{algorithmic}
+\end{algorithm}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{隐变量模型}
+隐变量模型（Latent Variable Model，LVM）通过引入未观测的潜在变量来解释数据生成过程，
+将复杂分布拆解为简单结构。
+
+假设隐变量为$z$，而观测变量为$x$，则隐变量模型为：
+\begin{align}
+    p(x,z) &= p(z|x)p(x) \\
+    p(x) &= \sum_{z} p(x,z) \quad \text{if z is discrete}\\
+    p(x) &= \int_{z} p(x,z) dz \quad \text{if z is continuous}
+\end{align}
+
+\subsection{隐变量模型的训练}
+给定数据集$\{{\mathbf{x}_i}\}_{i=1}^N$,如何训练隐变量模型$p_{\mathbf{\theta}}({\mathbf{x},\mathbf{z}})$
+
+问题转化：
+
+模型$p_{\mathbf{\theta}}({\mathbf{x},\mathbf{z}})$越好，则该模型与训练数据的拟合程度越高，
+说明要最大化数据样本的概率密度
+$$
+p_{\mathbf{\theta}}({\mathbf{x}}) = \prod_{i=1}^{N} p_{\mathbf{\theta}}({\mathbf{x}_i})
+$$
+即 
+$$
+\max_{\mathbf{\theta}} \prod_{i=1}^{N} p_{\mathbf{\theta}}({\mathbf{x}_i})
+$$
+取对数概率，得到
+$$
+\max_{\mathbf{\theta}} \sum_{i=1}^{N} \log p_{\mathbf{\theta}}({\mathbf{x}})
+$$
+将$ p_{\mathbf{\theta}}({\mathbf{x}_i}) = \int_{\mathbf{z}_i} p_{\mathbf{\theta}}({\mathbf{x}_i,\mathbf{z}_i}) dz_i$代入，得到
+\begin{equation}
+    \label{eq:隐变量模型的训练目标函数}
+    \max_{\mathbf{\theta}} \sum_{i=1}^{N} \log \int_{\mathbf{z}_i} p_{\mathbf{\theta}}({\mathbf{x}_i,\mathbf{z}_i}) dz_i
+\end{equation}
+由\cref{eq:隐变量模型的训练目标函数}可见，隐变量模型的训练难度主要在于
+很难写出$ p_{\mathbf{\theta}}({\mathbf{x}_i})$的表达式，因为其中存在积分。
+
+
+\subsection{高斯混合模型}
+高斯混合模型（Gaussian Mixture Model，GMM）是由多个高斯分布组成的混合分布。
+\begin{equation}
+    \label{eq:高斯混合模型}
+    p(\mathbf{x}) = \sum_{k=1}^K \pi_k \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)
+\end{equation}
+其中，$\pi_k$是第$k$个高斯分布的权重，$\mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)$是第$k$个高斯分布，
+$\bm{\mu}_k$是第$k$个高斯分布的均值，$\Sigma_k$是第$k$个高斯分布的协方差矩阵。
+
+补充说明：$\mathcal{N}(\mathbf{x};\bm{\mu},\Sigma) $表示高斯分布（又称为正态分布），其表达式为：
+\begin{equation}
+    \label{eq:高斯分布}
+    \mathcal{N}(\mathbf{x};\bm{\mu},\Sigma) = 
+    \frac{1}{(2\pi)^{\frac{D}{2}} \left |{\Sigma}\right |^{\frac{1}{2}}} \exp\left(-\frac{1}{2}(\mathbf{x}-\bm{\mu})^T\Sigma^{-1}(\mathbf{x}-\bm{\mu})\right)
+\end{equation}
+
+高斯混合模型可以写成隐变量模型的形式，下面给出具体的推导
+
+假设$\mathbf{z}$是一个独热向量
+$$
+\mathbf{z} = 
+\begin{bmatrix}
+    z_1\\ z_2 \\ \vdots \\ z_K
+\end{bmatrix},
+\quad
+z_k = \{0, 1\},
+\quad
+k = 1,\dots,K
+$$
+用$\mathbf{e}_k$表示第$k$个元素为1，其余元素为0的独热向量。
+
+对于$\forall k, \quad (k=1,\dots,K) $,
+在高斯混合模型中
+\begin{enumerate}
+    \item 每一个高斯分布$\mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)$
+可以视为是条件分布$p(\mathbf{x}|\mathbf{z} = \mathbf{e}_k)$
+    \item 权重$\pi_k$可视为先验概率$ p(\mathbf{z} = \mathbf{e}_k)$
+\end{enumerate}
+即有：
+\begin{equation}
+    \label{eq:高斯混合模型中条件分布}
+    p(\mathbf{x}|\mathbf{z} = \mathbf{e}_k) = \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)
+\end{equation}
+\begin{equation}
+    \label{eq:高斯混合模型中先验概率}
+    p(\mathbf{z} = \mathbf{e}_k) = \pi_k
+\end{equation}
+
+注意：权重$\pi_k$对应一个类别分布，表示$\mathbf{z}$属于第k类的概率，满足
+\begin{equation}
+    \label{eq:高斯混合模型中权重所满足的条件1}
+    0<\pi_k<1, \quad k = 1,\dots,K
+\end{equation}
+
+\begin{equation}
+    \label{eq:高斯混合模型中权重所满足的条件2}
+    \sum_{k=1}^K \pi_k = 1
+\end{equation}
+
+于是可以得到边缘分布：
+\begin{align}
+    \label{eq:高斯混合模型中边缘分布}
+    p(\mathbf{x}) 
+    &= \sum_{z} p(\mathbf{x},\mathbf{z} ) \nonumber \\
+    &= \sum_{k=1}^{K} p(\mathbf{x},\mathbf{z} = \mathbf{e}_k) \nonumber \\
+    &= \sum_{k=1}^K p(\mathbf{z}=\mathbf{e}_k) p(\mathbf{x}|\mathbf{z} = \mathbf{e}_k) \nonumber \\
+    &= \sum_{k=1}^K \pi_k \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)
+\end{align}
+
+结合\cref{eq:高斯混合模型中边缘分布},后验概率$p(\mathbf{z}=\mathbf{e}_k|\mathbf{x})$可以表示为：
+\begin{align}
+    \label{eq:高斯混合模型中后验概率}
+    p(\mathbf{z}=\mathbf{e}_k|\mathbf{x}) 
+    &= \frac{p(\mathbf{x},\mathbf{z}=\mathbf{e}_k)}{p(\mathbf{x})} \nonumber \\
+    &= \frac{\pi_k \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)}{\sum_{i=1}^{K} \pi_i \mathcal{N}(\mathbf{x};\bm{\mu}_i,\Sigma_i)}
+\end{align}
+
+考虑到$\mathbf{z}$是一个独热向量，\cref{eq:高斯混合模型中条件分布,eq:高斯混合模型中先验概率}可以写为更一般的形式
+\begin{equation}
+    \label{eq:高斯混合模型中条件分布一般形式}
+    p(\mathbf{x}|\mathbf{z}) = \prod_{k=1}^{K} (\mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k))^{z_k}
+\end{equation}
+\begin{equation}
+    \label{eq:高斯混合模型中先验概率一般形式}
+    p(\mathbf{z}) = \prod_{k=1}^{K} \pi_k^{z_k}
+\end{equation}
+
+利用\cref{eq:高斯混合模型中条件分布一般形式,eq:高斯混合模型中先验概率一般形式},可以写出$\mathbf{x},\mathbf{z}$的联合概率分布，即为隐变量模型
+\begin{align}
+    \label{eq:高斯混合模型的联合概率分布}
+    p(\mathbf{x},\mathbf{z}) 
+    &= p(\mathbf{z}) p(\mathbf{x}|\mathbf{z})  \nonumber \\
+    &= \prod_{k=1}^{K} \pi_k^{z_k} \prod_{k=1}^{K} (\mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k))^{z_k} \nonumber \\
+    &= \prod_{k=1}^{K} ( \pi_k  \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k))^{z_k}
+\end{align}
+
+对于一个数据集$\{\mathbf{x}^{(i)}\}_{i=1}^{N}$,假设每一个数据样本$\mathbf{x}^{(i)}$之间是独立且同分布的，
+则它们的联合概率分布为：
+$$
+p(\mathbf{x}^{(1)},\mathbf{x}^{(2)},\dots,\mathbf{x}^{(N)}) = \prod_{i=1}^{N} p(\mathbf{x}^{(i)})
+$$
+
+代入高斯混合模型的边缘分布\cref{eq:高斯混合模型中边缘分布}，得到：
+\begin{equation}
+    \label{eq:高斯混合模型对于一个数据集合x的联合概率分布}
+    p(\mathbf{x}^{(1)},\mathbf{x}^{(2)},\dots,\mathbf{x}^{(N)}) = \prod_{i=1}^{N} \sum_{k=1}^{K} \pi_k  \mathcal{N}(\mathbf{x}^{(i)};\bm{\mu}_k,\Sigma_k)
+\end{equation}
+
+对\cref{eq:高斯混合模型对于一个数据集合x的联合概率分布}取对数，可得：
+\begin{align}
+    \label{eq:高斯混合模型对于一个数据集合x的联合概率分布_log}
+    &\ln p(\mathbf{x}^{(1)},\mathbf{x}^{(2)},\dots,\mathbf{x}^{(N)}) \nonumber \\
+    =& \sum_{i=1}^{N} \ln \left [ \sum_{k=1}^{K} \pi_k  \mathcal{N}(\mathbf{x}^{(i)};\bm{\mu}_k,\Sigma_k) \right ]  \nonumber \\
+    =& \sum_{i=1}^{N} \ln \sum_{k=1}^{K} \pi_k \left [ \frac{1}{(2\pi)^{\frac{D}{2}} \left |{\Sigma}\right |^{\frac{1}{2}}} \exp\left(-\frac{1}{2}(\mathbf{x}^{(i)}-\bm{\mu})^T\Sigma^{-1}(\mathbf{x}^{(i)}-\bm{\mu})\right) \right ]
+\end{align}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EM算法}
+隐变量模型的参数难以估计，需要使用EM算法来训练。
+
+EM算法的基本思想是通过最大化似然函数在隐变量$\mathbf{z}$上的期望，从而更新模型的参数$\theta$。
+
+\subsubsection{理论保证}
+
+首先将对数似然函数进行重新表示,假设隐变量$\mathbf{z}$的分布为$q(\mathbf{z})$
+显然有$\sum_{\mathbf{z}} q(\mathbf{z}) = 1$,故
+\begin{equation}
+    \label{eq:对数似然函数的重新表示1}
+\ln p(\mathbf{x};\theta) 
+= \sum_{\mathbf{z}} q(\mathbf{z}) \ln p(\mathbf{x};\theta) 
+\end{equation}
+由条件概率的知识，有：
+\begin{equation}
+    \label{eq:条件概率公式}
+p(\mathbf{x};\theta) = \frac{p(\mathbf{x},\mathbf{z};\theta)}{ p(\mathbf{z}| \mathbf{x};\theta)} 
+\end{equation}
+
+将\cref{eq:条件概率公式}代入\cref{eq:对数似然函数的重新表示1},得到
+\begin{align*}
+\ln p(\mathbf{x};\theta) 
+=& \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{p(\mathbf{z}|\mathbf{x};\theta)} \nonumber \\
+=& \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta) q(\mathbf{z})}{p(\mathbf{z}|\mathbf{x};\theta) q(\mathbf{z})} \nonumber \\
+=& \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta) q(\mathbf{z})}{ q(\mathbf{z}) p(\mathbf{z}|\mathbf{x};\theta)} \nonumber \\
+=& \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{ q(\mathbf{z}) } + \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{q(\mathbf{z})}{p(\mathbf{z}|\mathbf{x};\theta)}
+\end{align*}
+即
+\begin{equation}
+    \label{eq:对数似然函数的重新表示2}
+\ln p(\mathbf{x};\theta) 
+= \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{ q(\mathbf{z}) } + \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{q(\mathbf{z})}{p(\mathbf{z}|\mathbf{x};\theta)}
+\end{equation}
+
+%%%%%% KL散度 %%%%%%
+根据KL散度的知识，KL散度用于衡量两个概率分布之间的距离，如果两个分布越接近，则KL散度越接近0。
+
+如果$\mathbf{z} $是连续变量，则KL散度为
+\begin{equation}
+    \label{eq:KL_divergence_between_q_and_p_if_z_is_continuous}
+    KL(q||p) \triangleq  \int_{\mathbf{z}} q(\mathbf{z}) \ln \frac{q(\mathbf{z})}{p(\mathbf{z})} d\mathbf{z} 
+\end{equation}
+
+如果$\mathbf{z}$ 是离散变量，则KL散度为
+\begin{equation}
+    \label{eq:KL_divergence_between_q_and_p_if_z_is_discrete}
+    KL(q||p) \triangleq  \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{q(\mathbf{z})}{p(\mathbf{z})} 
+\end{equation}
+
+KL散度具有非负性
+$$
+    KL(q||p) \geq 0
+$$
+
+不难发现，\cref{eq:对数似然函数的重新表示2}的等号右边部分就是KL散度，
+\begin{equation}
+    \label{eq:KL_divergence_in_对数似然函数的重新表示2}
+    KL(q(\mathbf{z})||p(\mathbf{z}|\mathbf{x};\theta)) = \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{q(\mathbf{z})}{p(\mathbf{z}|\mathbf{x};\theta)} \geq 0 
+\end{equation}
+
+将\cref{eq:KL_divergence_in_对数似然函数的重新表示2}代入\cref{eq:对数似然函数的重新表示2}，就可以得到对数似然函数的一个下界。
+\begin{equation}
+    \label{eq:对数似然函数的下界}
+    \ln p(\mathbf{x};\theta) \geq \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{q(\mathbf{z})}
+\end{equation}
+为了方便，将下界记为lower bound
+\begin{equation}
+    \label{eq:对数似然函数的lower_bound}
+    \mathcal{L}(q,\theta) = \sum_{\mathbf{z}} q(\mathbf{z}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{q(\mathbf{z})}
+\end{equation}
+
+利用\cref{eq:对数似然函数的lower_bound}中的lower bound和\cref{eq:KL_divergence_in_对数似然函数的重新表示2}中的KL散度，
+可以将对数似然函数\cref{eq:对数似然函数的重新表示2}进一步表示为
+\begin{equation}
+    \label{eq:对数似然函数用lower_bound和KL_divergence表示}
+    \ln p(\mathbf{x};\theta) = \mathcal{L}(q,\theta) + KL(q(\mathbf{z})||p(\mathbf{z}|\mathbf{x};\theta))
+\end{equation}
+
+考虑一种特殊情况：
+当$\mathbf{z}$的分布就是后验概率时，即
+\begin{equation}
+    \label{eq:z的分布就是后验概率}
+    q(\mathbf{z}) = p(\mathbf{z}|\mathbf{x};\theta)
+\end{equation}
+时，KL散度 $ KL(q(\mathbf{z})||p(\mathbf{z}|\mathbf{x};\theta)) = 0 $，
+这时$\mathcal{L}(q,\theta)$可以取到最大值，即
+$$
+\ln p(\mathbf{x};\theta) = \mathcal{L}(q,\theta)
+$$
+代入\cref{eq:z的分布就是后验概率}，
+\begin{align}
+    \label{eq:KL散度等于0时的对数似然函数}
+    \ln p(\mathbf{x};\theta) 
+    =& \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta),\theta) \nonumber \\
+    =& \sum_{\mathbf{z}} p(\mathbf{z}|\mathbf{x};\theta) \ln \frac{p(\mathbf{x},\mathbf{z};\theta)}{p(\mathbf{z}|\mathbf{x};\theta)}
+\end{align}
+
+在训练过程中，对于$t$时刻，
+我们的目标是使得$\ln p(\mathbf{x};\theta^{(t)})$最大，
+那么要尽可能找到接近于$p(\mathbf{z}|\mathbf{x};\theta^{(t)})$的分布$q(\mathbf{z})$，
+从而使得KL散度最小。
+
+KL散度最小为0，这时
+$
+q(\mathbf{z}) = p(\mathbf{z}|\mathbf{x};\theta^{(t)})
+$，
+又根据前面的推导\cref{eq:KL散度等于0时的对数似然函数}可知，
+\begin{align}
+    \label{eq:t时刻KL散度等于0时的对数似然函数}
+    \ln p(\mathbf{x};\theta^{(t)}) 
+    =& \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta^{(t)}) \nonumber \\
+    =& \sum_{\mathbf{z}} p(\mathbf{z}|\mathbf{x};\theta^{(t)}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta^{(t)})}{p(\mathbf{z}|\mathbf{x};\theta^{(t)})}
+\end{align}
+
+在t时刻，通过最大化对数似然函数的下界（lower bound）来更新模型参数$\theta$
+\begin{equation}
+    \label{eq:t时刻更新模型参数theta}
+    \theta^{(t+1)} = arg\max_{\theta} \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta)
+\end{equation}
+因此
+\begin{equation}
+    \label{eq:t时刻更新模型参数theta后的lower_bound}
+    \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta^{(t+1)}) \geq \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta^{(t)})
+\end{equation}
+
+结合\cref{eq:t时刻KL散度等于0时的对数似然函数,eq:t时刻更新模型参数theta后的lower_bound}
+\begin{align*}
+    \ln p(\mathbf{x};\theta^{(t)}) 
+    =& \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta^{(t)}) \nonumber \\
+    \leq & \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta^{(t+1)}) \nonumber \\
+    \leq & \mathcal{L}( p(\mathbf{z}|\mathbf{x};\theta^{(t+1)}),\theta^{(t+1)}) \nonumber \\
+    =& \ln p(\mathbf{x};\theta^{(t+1)}) 
+\end{align*}
+从而可知每一步更新都能使得似然函数递增。
+\begin{equation}
+    \label{eq:似然函数递增关系}
+    \ln p(\mathbf{x};\theta^{(t)}) \leq \ln p(\mathbf{x};\theta^{(t+1)}) 
+\end{equation}
+
+上面\cref{eq:似然函数递增关系}证明了似然函数是递增的。
+下面可以很容易地利用此结论来证明EM算法的更新也是递增的。
+
+注意到似然函数的下界（lower bound）可以写为
+\begin{align}
+    \label{eq:lower_bound的公式改写}
+    \mathcal{L}(p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta)
+    =& \sum_{\mathbf{z}} p(\mathbf{z}| \mathbf{x}; \theta^{(t)}) \ln \frac{p(\mathbf{x},\mathbf{z};\theta^{(t)})}{p(\mathbf{z}|\mathbf{x};\theta^{(t)})} \nonumber \\
+    =& \sum_{\mathbf{z}} p(\mathbf{z}| \mathbf{x}; \theta^{(t)}) \ln p(\mathbf{x},\mathbf{z};\theta^{(t)}) - \sum_{\mathbf{z}} p(\mathbf{z}| \mathbf{x}; \theta^{(t)}) \ln p(\mathbf{z}|\mathbf{x};\theta^{(t)})
+\end{align}
+
+不难发现，似然函数的下界可以写成两个部分：
+\begin{enumerate}
+    \item 第一个部分$\sum_{\mathbf{z}} p(\mathbf{z}| \mathbf{x}; \theta^{(t)}) \ln p(\mathbf{x},\mathbf{z};\theta^{(t)})$，
+    这部分就等于$\mathbb{E}_{p(\mathbf{z}|\mathbf{x};\theta^{(t)})} \left[ \ln p(\mathbf{x},\mathbf{z};\theta)\right]$;
+    \item 第二个部分$\sum_{\mathbf{z}} p(\mathbf{z}| \mathbf{x}; \theta^{(t)}) \ln p(\mathbf{z}|\mathbf{x};\theta^{(t)})$是常数。
+\end{enumerate}
+
+记期望为
+\begin{equation}
+    \label{eq:EM算法的期望计算}
+    \mathcal{Q}(\theta,\theta^{(t)}) \triangleq \mathbb{E}_{p(\mathbf{z}|\mathbf{x};\theta^{(t)})} \left[ \ln p(\mathbf{x},\mathbf{z};\theta)\right]
+\end{equation}
+EM算法更新参数$\theta$
+\begin{equation}
+    \theta^{(t+1)} = \arg\max_\theta \mathcal{Q}(\theta,\theta^{(t)}) 
+\end{equation}
+
+那么最大化期望与最大化似然函数下界是等价的：
+$$
+\arg\max_\theta \mathcal{Q}(\theta,\theta^{(t)}) \Leftrightarrow \arg\max_\theta \mathcal{L}(p(\mathbf{z}|\mathbf{x};\theta^{(t)}),\theta)
+$$
+由于前面\cref{eq:似然函数递增关系}已经证明了似然函数是递增的，
+故EM算法也是保证递增的。
+
+\textbf{注意：} 
+以上证明其实是针对单个样本$\mathbf{x}$的，
+对于多个样本的数据集$\{ \mathbf{x}^{(i)} \}_{i=1}^N$,期望的计算变为：
+\begin{equation}
+    \label{eq:EM算法在多个样本数据集上的期望计算}
+    \mathcal{Q}(\theta,\theta^{(t)}) \triangleq \frac{1}{N} \sum_{n=1}^{N} \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right]
+\end{equation}
+其余部分的计算不变。
+
+显然，在多个样本的数据集上，EM算法也是保证递增的。
+
+
+\subsubsection{EM算法总结}
+EM算法的流程可以总结为:
+\begin{algorithm}[H]
+    \caption{EM Algorithm}
+    \begin{algorithmic}[1]
+        \REQUIRE Dataset $X = \mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(N)}\}$, initial parameters $\theta^{(0)}$
+        \ENSURE Estimated parameters $\theta$
+        
+        \STATE $t \leftarrow 0$
+        \REPEAT
+            \STATE \textbf{E-step:} Compute the posterior distribution of latent variables:
+            \[
+                p(\mathbf{z} \mid \mathbf{x}; \theta^{(t)})
+            \]
+            Then compute either the lower bound
+            \[
+                \mathcal{L}\big(p(\mathbf{z}\mid \mathbf{x}; \theta^{(t)})\big)
+            \]
+            or the auxiliary function
+            \[
+                \mathcal{Q}(\theta; \theta^{(t)}) = 
+                \frac{1}{N} \sum_{n=1}^{N} \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right].
+            \]
+
+            \STATE \textbf{M-step:} Update the parameters:
+            \[
+                \theta^{(t+1)} = \arg\max_{\theta} \mathcal{Q}(\theta; \theta^{(t)})
+            \]
+            or equivalently maximize the lower bound $\mathcal{L}$.
+
+            \STATE $t \leftarrow t + 1$
+        \UNTIL{log-likelihood is converged}
+    \end{algorithmic}
+\end{algorithm}
+
+    
+\subsection{EM算法训练高斯混合模型}
+
+回顾高斯混合模型
+\cref{eq:高斯混合模型}
+$$
+p(\mathbf{x}) = \sum_{k=1}^K \pi_k \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k)
+$$
+其联合分布在\cref{eq:高斯混合模型的联合概率分布}中已给出：
+$$
+p(\mathbf{x},\mathbf{z}) 
+= \prod_{k=1}^{K} ( \pi_k  \mathcal{N}(\mathbf{x};\bm{\mu}_k,\Sigma_k))^{z_k}
+$$
+
+\subsubsection{E step}
+为了计算$\mathcal{Q}(\theta,\theta^{(t)}) $
+$$
+\mathcal{Q}(\theta,\theta^{(t)}) \triangleq \frac{1}{N} \sum_{n=1}^{N} \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right]
+$$
+首先要计算后验概率$p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})$ 
+和 联合分布的对数$\ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)$
+
+计算后验概率
+\begin{align}
+    \label{eq:高斯混合模型E步后验概率计算}
+    p(\mathbf{z}^{(n)}=\mathbf{e}_k|\mathbf{x}^{(n)};\theta^{(t)})
+    =& \frac{p(\mathbf{x}^{(n)},\mathbf{z}^{(n)}=\mathbf{e}_k;\theta^{(t)})}{\sum_{i=1}^{K} p(\mathbf{x}^{(n)},\mathbf{z}^{(n)}=\mathbf{e}_i;\theta^{(t)})} \nonumber \\
+    =& \frac{\pi_k^{(t)} \mathcal{N}(\mathbf{x}^{(n)}| \mu_k^{(t)},\Sigma_k^{(t)})}{\sum_{i=1}^{K} \pi_i^{(t)} \mathcal{N}(\mathbf{x}^{(n)}|\mu_i^{(t)},\Sigma_i^{(t)})}
+\end{align}
+将此定义为
+\begin{equation}
+    \label{eq:gamma定义}
+    \gamma_{nk}^{(t)} \triangleq \frac{\pi_k^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k^{(t)},\Sigma_k^{(t)} )}{\sum_{i=1}^{K} \pi_i^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_i^{(t)},\Sigma_i^{(t)} )}
+\end{equation}
+
+计算联合分布的对数
+\begin{equation}
+    \label{eq:高斯混合模型E步联合分布对数计算}
+    \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta) = \sum_{k=1}^{K} z_k \left[ \ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \mu_k^{(t)},\Sigma_k^{(t)} )\right]
+\end{equation}
+
+结合\cref{eq:高斯混合模型E步联合分布对数计算},可写出单个样本$ \mathbf{x}^{(n)} $的期望
+\begin{align}
+    \label{eq:单个样本的期望计算式1}
+    & \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right] \nonumber \\
+    = &\mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \sum_{k=1}^{K} z_k \left( \ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k,\Sigma_k )\right) \right] \nonumber \\
+    = & \sum_{k=1}^{K} \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ z_k \left(\ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k,\Sigma_k )\right) \right] \nonumber \\
+    = & \sum_{k=1}^{K} \left(\ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k,\Sigma_k )\right) \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ z_k \right] 
+\end{align}
+
+根据\cref{eq:高斯混合模型E步后验概率计算},
+\begin{equation}
+    \label{eq:z_k_的期望}
+    \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ z_k \right] 
+    =\sum_{j=1}^{K} z_j \frac{\pi_j^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_j^{(t)},\Sigma_j^{(t)} )}{\sum_{i=1}^{K} \pi_i^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_i^{(t)},\Sigma_i^{(t)} )}
+\end{equation}
+注意到只有$z_k=1$,其余的$z_j=0 (j \neq k, j=1, \cdots, K)$
+所以\cref{eq:z_k_的期望}可以进一步化简为：
+\begin{align}
+    \label{eq:z_k_的期望2}
+    \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ z_k \right] 
+    =& \sum_{j=1}^{K} z_j \frac{\pi_j^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_j^{(t)},\Sigma_j^{(t)} )}{\sum_{i=1}^{K} \pi_i^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_i^{(t)},\Sigma_i^{(t)} )} \nonumber \\
+    =& \frac{\pi_k^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k^{(t)},\Sigma_k^{(t)} )}{\sum_{i=1}^{K} \pi_i^{(t)} \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_i^{(t)},\Sigma_i^{(t)} )} \nonumber \\
+    =& \gamma_{nk}^{(t)} 
+\end{align}
+
+
+将\cref{eq:z_k_的期望2}代入\cref{eq:单个样本的期望计算式1}中,得到单个样本$\mathbf{x}^{(n)}$的期望
+\begin{equation}
+    \label{eq:单个样本的期望计算式2}
+    \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right] 
+    = \sum_{k=1}^{K} \gamma_{nk}^{(t)} \left(\ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k,\Sigma_k )\right)
+\end{equation}
+
+那么多个样本的期望便很容易计算了
+\begin{align}
+    \label{eq:多个样本的期望}
+    \mathcal{Q}(\theta,\theta^{(t)}) 
+    =& \frac{1}{N} \sum_{n=1}^{N} \mathbb{E}_{p(\mathbf{z}^{(n)}|\mathbf{x}^{(n)};\theta^{(t)})} \left[ \ln p(\mathbf{x}^{(n)},\mathbf{z}^{(n)};\theta)\right] \nonumber \\
+    =& \frac{1}{N} \sum_{n=1}^{N} \sum_{k=1}^{K} \gamma_{nk}^{(t)} \left(\ln \pi_k + \ln \mathcal{N}(\mathbf{x}^{(n)}; \bm{\mu}_k,\Sigma_k )\right)
+\end{align}
+
+将高斯分布\cref{eq:高斯分布}代入\cref{eq:多个样本的期望}中，可得
+\begin{equation}
+    \label{eq:多个样本的期望2}
+    \mathcal{Q}(\theta,\theta^{(t)}) 
+    =  \frac{1}{N} \sum_{n=1}^{N} \sum_{k=1}^{K} \gamma_{nk}^{(t)} \left[ \ln \pi_k - \frac{1}{2} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)^\mathrm{T} \Sigma_k^{-1} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) - \frac{1}{2} \ln \left| \Sigma_k \right| \right] + C 
+\end{equation}
+
+\subsubsection{M step}
+
+经过前面的E step, 我们已经得到了多个样本的期望$\mathcal{Q}(\theta,\theta^{(t)})$,具体表达式如\cref{eq:多个样本的期望2}所示，
+现在要求使得这个期望最大的参数$\bm{\mu}_k,\Sigma_k, \pi_k, k=1,2,\cdots,K$。
+
+由于\cref{eq:多个样本的期望2}是一个连续可微的函数，因此可以通过求偏导，并令其为0来求解参数。
+
+\textbf{对$\bm{\mu}_k$求偏导}
+\begin{equation}
+    \label{eq:对均值mu求偏导} 
+    \frac{\partial \mathcal{Q}(\theta,\theta^{(t)})}{\partial \bm{\mu}_k}
+     = \frac{1}{N} \sum_{n=1}^N \gamma_{nk}^{(t)} \Sigma_k^{-1} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)
+\end{equation}
+令其等于0，即
+\begin{align}
+    \label{eq:对均值mu求偏导后化简} 
+    & \frac{1}{N} \sum_{n=1}^N \gamma_{nk}^{(t)} \Sigma_k^{-1} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) = 0 \nonumber \\
+    \Rightarrow & \sum_{n=1}^N \gamma_{nk}^{(t)} \Sigma_k^{-1} \mathbf{x}^{(n)} = \left( \sum_{n=1}^N \gamma_{nk}^{(t)} \right) \Sigma_k^{-1} \bm{\mu}_k \nonumber \\
+    \Rightarrow & \sum_{n=1}^N \gamma_{nk}^{(t)} \mathbf{x}^{(n)} = \left( \sum_{n=1}^N \gamma_{nk}^{(t)} \right) \bm{\mu}_k \nonumber \\
+    \Rightarrow & \bm{\mu}_k = \frac{ \sum_{n=1}^N \gamma_{nk}^{(t)} \mathbf{x}^{(n)} }{ \sum_{n=1}^N \gamma_{nk}^{(t)}}
+\end{align}
+
+由于$\gamma_{nk}^{(t)}$是样本$\mathbf{x}^{(n)}$属于第k类的概率，
+说明：
+\begin{enumerate}
+    \item 如果$\gamma_{nk}^{(t)}$接近于1，则$\mathbf{x}^{(n)}$有较大可能性属于第k类
+    \item 如果$\gamma_{nk}^{(t)}$接近于0，则$\mathbf{x}^{(n)}$有较小可能性属于第k类
+\end{enumerate}
+所以，令$N_k \triangleq \sum_{n=1}^N \gamma_{nk}^{(t)}$,\quad $N_k$表示属于第k类的样本数量
+
+利用$N_k$,\cref{eq:对均值mu求偏导} 中的$\bm{\mu}_k $便可以写为
+\begin{equation}
+    \label{eq:GMM中均值mu的公式}
+    \bm{\mu}_k = \frac{1}{N_k} \sum_{n=1}^N \gamma_{nk}^{(t)} \mathbf{x}^{(n)}
+\end{equation}
+
+\textbf{对$\Sigma_k$求偏导}
+\begin{equation}
+    \label{eq:对协方差矩阵Sigma求偏导} 
+    \frac{\partial \mathcal{Q}(\theta,\theta^{(t)})}{\partial \Sigma_k}
+     = \frac{1}{2N} \Sigma_k^{-1} \left[ \sum_{n=1}^N \gamma_{nk}^{(t)} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)^\mathrm{T} - \left( \sum_{n=1}^N \gamma_{nk}^{(t)} \right) \Sigma_k \right] \Sigma_k^{-1}
+\end{equation}
+令其等于0，即
+\begin{align}
+    \label{eq:对协方差矩阵Sigma求偏导后化简} 
+    & \frac{1}{2N} \Sigma_k^{-1} \left[ \sum_{n=1}^N \gamma_{nk}^{(t)} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)^\mathrm{T} - \left( \sum_{n=1}^N \gamma_{nk}^{(t)} \right) \Sigma_k \right] \Sigma_k^{-1} = 0 \nonumber \\
+    \Rightarrow & \Sigma_k = \frac{ \sum_{n=1}^N \gamma_{nk}^{(t)} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)^\mathrm{T} }{\sum_{n=1}^{N} \gamma_{nk}^{(t)}}
+\end{align}
+代入$N_k \triangleq \sum_{n=1}^N \gamma_{nk}^{(t)}$，可得
+\begin{equation}
+    \label{eq:GMM中协方差矩阵Sigma的公式}
+    \Sigma_k = \frac{1}{N_k} \sum_{n=1}^N \gamma_{nk}^{(t)} \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right) \left(\mathbf{x}^{(n)}-\bm{\mu}_k \right)^\mathrm{T}
+\end{equation}
+
+\begin{equation}
+    \label{eq:GMM中权重pi的公式}
+    \pi_k = \frac{N_k}{N}
+\end{equation}
+
+\subsubsection{GMM的EM算法总结}
+GMM的EM算法总结如下:
+\begin{algorithm}[H]
+    \caption{EM Algorithm for Gaussian Mixture Models (GMM)}
+    \begin{algorithmic}[1]
+        \REQUIRE Data $\{\mathbf{x}^{(n)}\}_{n=1}^N$, number of components $K$
+        \ENSURE Estimated parameters $\{\pi_k, \boldsymbol{\mu}_k, \Sigma_k\}_{k=1}^K$
+
+        \STATE Initialize parameters $\pi_k^{(0)}, \boldsymbol{\mu}_k^{(0)}, \Sigma_k^{(0)}$
+        \STATE $t \leftarrow 0$
+
+        \REPEAT
+            \STATE \textbf{E-step:} Compute responsibilities
+            \[
+                \gamma_{nk}^{(t+1)}
+                =
+                \frac{\pi_k^{(t)} \, 
+                \mathcal{N}(\mathbf{x}^{(n)} \mid \boldsymbol{\mu}_k^{(t)}, \Sigma_k^{(t)})}
+                {\sum_{j=1}^K 
+                \pi_j^{(t)}
+                \mathcal{N}(\mathbf{x}^{(n)} \mid \boldsymbol{\mu}_j^{(t)}, \Sigma_j^{(t)})}.
+            \]
+            Compute the log-likelihood:
+            \[
+                \log p(\mathbf{x} \mid \pi^{(t)}, \boldsymbol{\mu}^{(t)}, \Sigma^{(t)})
+                = \sum_{n=1}^N 
+                \log \left( \sum_{k=1}^K 
+                \pi_k^{(t)} 
+                \mathcal{N}(\mathbf{x}^{(n)} \mid \boldsymbol{\mu}_k^{(t)}, \Sigma_k^{(t)}) \right).
+            \]
+
+            \STATE \textbf{M-step:} Update parameters using the responsibilities
+            \[
+                N_k^{(t+1)} = \sum_{n=1}^N \gamma_{nk}^{(t+1)}.
+            \]
+            \[
+                \boldsymbol{\mu}_k^{(t+1)}
+                = \frac{1}{N_k^{(t+1)}} 
+                \sum_{n=1}^N \gamma_{nk}^{(t+1)} \mathbf{x}^{(n)}.
+            \]
+            \[
+                \Sigma_k^{(t+1)}
+                = \frac{1}{N_k^{(t+1)}}
+                \sum_{n=1}^N \gamma_{nk}^{(t+1)}
+                \left(\mathbf{x}^{(n)} - \boldsymbol{\mu}_k^{(t+1)}\right)
+                \left(\mathbf{x}^{(n)} - \boldsymbol{\mu}_k^{(t+1)}\right)^{\mathrm{T}}.
+            \]
+            \[
+                \pi_k^{(t+1)} = \frac{N_k^{(t+1)}}{N}.
+            \]
+
+            \STATE $t \leftarrow t + 1$
+
+        \UNTIL{log-likelihood is converged}
+
+    \end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{图表的插入}
+切记：“上表下图”，即表格的标题在其上方，图的标题在其下方
+\subsection{表格的插入}
+
+表格应具有三线表格式，因此常用 booktabs宏包，其标准格式如\cref{tab:001}~所示。
+
+\begin{table}[!htbp]
+    \caption{标准三线表格}\label{tab:001} \centering
+    \begin{tabular}{cccccc} % 选择对齐方式：c:居中，l:左，r:右
+        \toprule[1.5pt] %表格最上面的线的线宽
+        $D$(in) & $P_u$(lbs) & $u_u$(in) & $\beta$ & $G_f$(psi.in)\\
+        \midrule[1pt] %表格最中间的线的线宽
+        5 & 269.8 & 0.000674 & 1.79 & 0.04089\\
+        10 & 421.0 & 0.001035 & 3.59 & 0.04089\\
+        20 & 640.2 & 0.001565 & 7.18 & 0.04089\\
+        \bottomrule[1.5pt] %表格最下面的线的线宽
+    \end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{图的插入}
+
+先把图片导入到figures文件夹，然后再按照以下代码插入到论文中。
+插入的图片如 \cref{fig:circuit-diagram}~所示。
+
+\begin{figure}[!ht]
+    \centering % 图片居中
+    \includegraphics[width=.8\textwidth]{beautiful_sight} % 图片的文件名，不用加后缀！
+    \caption{风景图}
+    \label{fig:circuit-diagram}
+\end{figure}
+
+代码解释：
+
+[!h] 是 位置参数，告诉 LaTeX 希望图片放在哪：
+\begin{itemize}[itemindent=2em]
+\item h (here)：尽量放在当前位置。
+
+\item t (top)：放在页面顶部。
+
+\item b (bottom)：放在页面底部。
+
+\item p (page of floats)：单独放在一个只包含浮动体的页面。
+
+\item ! (override)：忽略 LaTeX 的部分限制，更强制地按照指定位置放。
+
+\end{itemize}
+
+[!h] 就是強烈要求放在目前位置。
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 参考文献
+\nocite{*}
+\bibliographystyle{gbt7714-numerical}  % 引用格式
+\bibliography{ref.bib}  % bib源
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 附录
+\begin{appendices}
+\section{文件列表}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{LL}
+\toprule
+文件名   & 功能描述 \\
+\midrule
+q1.m & 问题一程序代码 \\
+q2.py & 问题二程序代码 \\
+q3.c & 问题三程序代码 \\
+q4.cpp & 问题四程序代码 \\
+\bottomrule
+\end{tabularx}
+\label{tab:文件列表}
+\end{table}
+
+\section{代码}
+\noindent q1.m
+\lstinputlisting[language=matlab]{code/q1.m}
+q2.py
+\lstinputlisting[language=python]{code/q2.py}
+q3.c
+\lstinputlisting[language=c]{code/q3.c}
+q4.cpp
+\lstinputlisting[language=c++]{code/q4.cpp}
+\end{appendices}
+\end{document}
+
+
