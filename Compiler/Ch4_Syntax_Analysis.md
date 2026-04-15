@@ -1,18 +1,12 @@
 # Chapter 4 Syntax Analysis 语法分析
 
+类型：
 
-
-自顶向下分析
-
-
-
-自底向上分析
-
+- 自顶向下分析
+- 自底向上分析
 
 
 ## 自顶向下分析 Top-Down parsing
-
-
 
 ### 改写文法 
 
@@ -326,3 +320,223 @@ LL(1)预测分析算法
 
 
 恐慌模式
+
+
+
+
+
+## 自底向上分析 Bottom-Up Parsing
+
+> 定义：从输入符号串开始，逐步进行归约，直至归约到文法的开始符号。
+
+
+
+自底向上与自顶向下的关系
+
+- 自底向上分析的归约过程是自顶向下推导的逆过程。
+
+- **最右推导**为**规范推导**，所以**自左向右的归约**称为**规范归约**
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260413085413257.png" alt="image-20260413085413257" style="zoom: 50%;" />
+
+
+
+### 移进-归约分析 Shift-Reduce Parsing
+
+##### Example
+
+根据文法
+$$
+G[E]: E→E+E|E×E|(E)|n
+$$
+对输入串$n+n×n$，进行移进-归约分析
+
+Answer：
+
+| 步骤 | 符号栈             | 输入字符串         | 动作                                    |
+| ---- | ------------------ | ------------------ | --------------------------------------- |
+| 1    | $\$ $              | $n+n \times n \$ $ | 移进                                    |
+| 2    | $\$ n$             | $+n \times n \$ $  | 归约 $E \rightarrow n$                  |
+| 3    | $\$ E$             | $+n \times n \$ $  | 移进                                    |
+| 4    | $\$ E+$            | $n \times n \$ $   | 移进                                    |
+| 5    | $\$ E+n$           | $ \times n \$ $    | 归约 $E \rightarrow n$                  |
+| 6    | $\$ E+E$           | $ \times n \$ $    | 归约 $E \rightarrow E+E$                |
+| 7    | $\$ E$             | $ \times n \$ $    | <span style="color:red;">ERROR</span>   |
+| 8    | $ \$ E+E$          | $ \times n \$ $    | 移进                                    |
+| 9    | $ \$ E+E \times$   | $ n \$ $           | 移进                                    |
+| 10   | $ \$ E+E \times n$ | $ \$ $             | 归约 $E \rightarrow n$                  |
+| 11   | $ \$ E+E \times E$ | $ \$ $             | 归约 $E \rightarrow E \times E$         |
+| 12   | $ \$ E+E$          | $ \$ $             | 归约 $E \rightarrow E+E$                |
+| 13   | $\$ E$             | $ \$ $             | <span style="color:blue;">ACCEPT</span> |
+
+
+
+### 算符优先分析 Operator-Precedence Parsing
+
+> **算法文法**：
+>
+> 设有上下文无关文法G，如果G中产生式的右部没有**两个非终结符**相连，则称G为算符文法
+>
+> 算符文法中不含$\varepsilon$产生式
+
+例如：
+
+$G[E]：E→E+E|E×E|(E)|i $ 是算符文法
+
+$G[E]：E→EAE|(E)|−E|id$ **不是**算符文法 （因为 $EAE$ 有两个非终结符相连）
+
+
+
+##### Example
+
+![image-20260413194623252](Ch4_Syntax_Analysis.assets/image-20260413194623252.png)
+
+![image-20260413194716490](Ch4_Syntax_Analysis.assets/image-20260413194716490.png)
+
+#### 优先函数
+
+算符优先关系表又叫优先矩阵
+
+算符的优先关系除了使用优先矩阵来表示之外，还可以使用**优先函数**来表示。
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260413200004599.png" alt="image-20260413200004599" style="zoom:50%;" />
+
+##### 优先函数构造方法
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260413195837852.png" alt="image-20260413195837852" style="zoom: 50%;" />
+
+#### 优先矩阵 VS 优先函数
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260413195518213.png" alt="image-20260413195518213" style="zoom:50%;" />
+
+
+
+### LR(k)语法分析
+
+目前最流行的自底向上语法分析器都是基于LR(k)语法分析，其中
+
+- **L**表示从左到右扫描输入串
+
+- **R**表示最左归约（即最右推导的逆过程）
+
+- **k**表示向前查看输入串符号的个数
+
+  - 当k=1时，能满足当前绝大多数高级语言编译程序的需要，所以着重介绍 LR(0), SLR(1), LR(1), LALR(1)方法
+
+  - 省略(k)时，一般指k=1
+
+> **LR(k) ** *VS* **LL(k)**
+>
+> LR(k)：只要在一个最右句型中看到某个产生式右部，再向前看k个符号就可以决定是否使用这个产生式进行归约
+>
+> LL(k)： 要向前查看某个产生式右部推导出的串的前k个符号，才能决定是否使用这个产生式进行推导
+
+
+
+### LR(0)分析
+
+> **LR(0)分析**
+>
+> 根据当前符号栈中的符号串和向前顺序查看输入串的**0**个符号就可**唯一地**确定句柄以进行归约，即，仅凭符号栈中的符号串即可确定句柄，做出归约决定，不需要向前查看输入符号
+
+#### 项目 Item
+
+> 在文法G中每个产生式右部的适当位置添加一个**圆点**构成项目
+
+简单地说，在产生式右部的 *字母前* 或 *字母后* 或 *字母之间* 加上一个圆点，就构成一个项目
+
+##### Example
+
+对于产生式 $A \rightarrow XYZ$，有4个项目：
+$$
+A \rightarrow \vdot XYZ \\
+A \rightarrow X \vdot YZ \\
+A \rightarrow XY \vdot Z \\
+A \rightarrow XYZ \vdot \\
+$$
+注意：产生式$A \rightarrow \varepsilon$，只有1个项目 $A \rightarrow \vdot$ 
+
+##### 项目的含义
+
+- 圆点的**左边**是分析过程中**已经识别**的部分。例如：$A \rightarrow X \vdot YZ$ 说明$X$已经被识别，$A \rightarrow XYZ \vdot $说明产生式的右部都已经被识别，可以归约成$A$
+-  圆点的**右边**是分析过程中**未被识别**的部分。例如：$A \rightarrow XY \vdot Z$说明还有$Z$未被识别， $A \rightarrow \vdot XYZ$ 说明全部都未被识别
+
+
+
+#### LR(0) 分析表
+
+- 动作表**(ACTION)** ：表示当前状态下面临输入符（终结符和$）应做的动作是移进、归约、接受或出错
+
+- 转换表**(GOTO)**：表示在当前状态下面临文法符号 （可能是终结符或非终结符）时应转向的下一个状态
+
+- 把关于终结符部分的GOTO表和ACTION表重叠，也就是把当前状态下面临终结符应做的移进-归约动作和转向动作表示在一起
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260415171427834.png" alt="image-20260415171427834" style="zoom: 33%;" />
+
+#### LR(0) 分析过程
+
+① 拓广文法：对文法G[S]，增加一条产生式S’→S，拓广为文法G’[S’]
+
+② 根据产生式构造LR(0)项目集：CLOUSRE函数和GOTO函数
+
+③ 根据项目集构造LR(0)DFA （②和③可以合并）
+
+④ 根据LR(0)DFA构造LR(0)分析表
+
+⑤ 根据LR(0)分析表进行LR(0)分析
+
+
+
+##### Example
+
+对以下文法进行LR(0)分析：
+$$
+G[E]: \; E→aA|b, A→cA|d, B→cB|d
+$$
+
+###### Step 1: 拓广文法
+
+$$
+G'[S']: \; S'→E, E→aA|bB, A→cA|d, B→cB|d
+$$
+
+###### Step2: 构造LR(0)DFA
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260415170721977.png" alt="image-20260415170721977" style="zoom: 50%;" />
+
+注意：
+
+- 这里的每一个绿色框就是一个CLOSURE函数，也是DFA的一个状态
+
+- 状态之间的转换关系就是一个GOTO函数
+
+
+
+###### Step3: 根据LR(0)DFA构造LR(0)分析表
+
+对产生式进行编号
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260415173243114.png" alt="image-20260415173243114" style="zoom:50%;" />
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260415171848108.png" alt="image-20260415171848108" style="zoom:50%;" />
+
+注意：
+
+状态从0开始编号
+
+
+
+###### Step4: 根据LR(0)分析表进行LR(0)分析
+
+| 步骤 | 状态栈   | 符号栈 | 输入串 | ACTION | GOTO | 解释（不用写在答案中）                                       |
+| ---- | -------- | ------ | -----: | ------ | ---- | ------------------------------------------------------------ |
+| 1    | 0        | $      |  bccd$ | $S_3$  |      | $ACTION[0,b]=S_3$                                            |
+| 2    | 03       | $b     |   ccd$ | $S_8$  |      | $ACTION[3,c]=S_8$                                            |
+| 3    | 038      | $bc    |    cd$ | $S_8$  |      | $ACTION[8,c]=S_8$                                            |
+| 4    | 0388     | $bcc   |     d$ | $S_9$  |      | $ACTION[8,d]=S_9$                                            |
+| 5    | 03889    | $bccd  |      $ | $r_6$  | 11   | $ACTION[9,\$]=r_6$, 从两个栈弹出1个元素，并且进行归约$B \rightarrow d$, 将B入符号栈；然后$GOTO[8,B]=11$ |
+| 6    | 0388(11) | $bccB  |      $ | $r_5$  | 11   | $ACTION[11,\$]=r_5$, 从两个栈弹出2个元素，并且进行归约$B \rightarrow cB$, 将B入符号栈；然后$GOTO[8,B]=11$ |
+| 7    | 038(11)  | $bcB   |      $ | $r_5$  | 7    | $ACTION[11,\$]=r_5$, 从两个栈弹出2个元素，并且进行归约$B \rightarrow cB$, 将B入符号栈；然后$GOTO[3,B]=7$ |
+| 8    | 037      | $bB    |      $ | $r_2$  | 1    | $ACTION[7,\$]=r_2$, 从两个栈弹出2个元素，并且进行归约$E \rightarrow cB$, 将E入符号栈；然后$GOTO[0,E]=1$ |
+| 9    | 01       | $E     |      $ | acc    |      | $ACTION[1,E]=acc$                                            |
+
