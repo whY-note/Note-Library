@@ -1,4 +1,4 @@
-# Chapter 2 Grammer 文法
+# Chapter 2: Grammer 文法
 
 **程序设计语言** 包括：
 

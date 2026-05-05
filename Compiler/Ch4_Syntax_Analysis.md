@@ -1,4 +1,4 @@
-# Chapter 4 Syntax Analysis 语法分析
+# Chapter 4: Syntax Analysis 语法分析
 
 类型：
 
@@ -539,4 +539,30 @@ $$
 | 7    | 038(11)  | $bcB   |      $ | $r_5$  | 7    | $ACTION[11,\$]=r_5$, 从两个栈弹出2个元素，并且进行归约$B \rightarrow cB$, 将B入符号栈；然后$GOTO[3,B]=7$ |
 | 8    | 037      | $bB    |      $ | $r_2$  | 1    | $ACTION[7,\$]=r_2$, 从两个栈弹出2个元素，并且进行归约$E \rightarrow cB$, 将E入符号栈；然后$GOTO[0,E]=1$ |
 | 9    | 01       | $E     |      $ | acc    |      | $ACTION[1,E]=acc$                                            |
+
+#### LR(0)分析存在的问题
+
+
+
+
+
+### SLR(1)分析
+
+基本思想：对于LR(0)**有冲突**的项目集用向前查看输入符号串的**1**个符号的办法加以解决
+
+解决方法：对归约项目$A→r \vdot$，只有当输入符号$a \in \text{FOLLOW}(A)$才进行归约，缩小归约范围，有可能解决冲突
+
+![image-20260417142830511](Ch4_Syntax_Analysis.assets/image-20260417142830511.png)
+
+### LR(1)分析
+
+#### LR(1)项目
+
+形式：$[A \rightarrow \alpha \vdot \beta, a]$
+
+在LR(0)项目的基础上增加一个终结符，这个终结符称为**向前搜索符（lookahead）**
+
+> **向前搜索符（lookahead）**：
+>
+> 表示产生式的右部完整匹配后，允许在**剩余符号串**中的**下一个**终结符
 
