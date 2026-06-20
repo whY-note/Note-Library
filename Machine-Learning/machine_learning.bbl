@@ -1,0 +1,25 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax\else
+  \urlstyle{same}\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \DeclareUrlCommand\doi{\urlstyle{rm}}\else
+  \providecommand\doi[1]{\href{https://doi.org/#1}{\nolinkurl{#1}}}\fi
+
+\bibitem[司守奎\ 等(2011)司守奎 and 孙玺菁]{司守奎2011数学建模算法与应用}
+司守奎, 孙玺菁.
+\newblock 数学建模算法与应用\allowbreak[M].
+\newblock 北京: 国防工业出版社, 2011.
+
+\bibitem[卓金武(2011)]{卓金武2011MATLAB}
+卓金武.
+\newblock MATLAB在数学建模中的应用\allowbreak[M].
+\newblock 北京: 北京航空航天大学出版社, 2011.
+
+\bibitem[蔡艾廷\ 等(2025)蔡艾廷, 苏俊霖, 戴昆, 赵晗, and 王嘉义]{ZJYW20250902002}
+蔡艾廷, 苏俊霖, 戴昆, 等.
+\newblock 基于长短期记忆网络和随机森林的井漏预测\allowbreak[J].
+\newblock 钻井液与完井液, 2025:\penalty0 1-9.
+
+\end{thebibliography}
