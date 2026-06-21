@@ -1,5 +1,7 @@
 # Chapter 1: Overview
 
+[TOC]
+
 ## What is compilation?
 
 不同语言有不同的编译方式
@@ -60,16 +62,16 @@ C 语言编译包括以下4个阶段：
 
 ```mermaid
 flowchart TD
-A("Source Code<br/>(hello.c)") --> C["Prepressing<br/>(cpp)"]
-B("Header Files<br/>(stdio.h)") --> C
-C --> D("Preprocessed<br/>(hello.i)") 
-D --> E["Compilation<br/>(cc)"]
-E --> F("Assembly<br/>(hello.s)")
-F --> G["Assemblied<br/>(as)"]
-G --> H("Object Files<br/>hello.o")
-H --> J["Linking<br/>(ld)"]
-I("Static Library<br/>(libc.a)") --> J
-J --> K("Executable<br/>(a.out)")
+A(["Source Code<br/>(hello.c)"]) --> C["Preprocessor<br/>(cpp)"]
+B(["Header Files<br/>(stdio.h)"]) --> C
+C --> D(["Preprocessed<br/>(hello.i)"])
+D --> E["Compiler<br/>(cc1)"]
+E --> F(["Assembly<br/>(hello.s)"])
+F --> G["Assembler<br/>(as)"]
+G --> H(["Object Files<br/>(hello.o)"])
+H --> J["Linker<br/>(ld)"]
+I(["Static Library<br/>(libc.a)"]) --> J
+J --> K(["Executable<br/>(a.out)"])
 ```
 
 
@@ -138,7 +140,7 @@ Input：源程序
 
 Output：token序列
 
-检查：token是否符合词法规则
+检查：token是否符合**词法规则**
 
 > **token**
 >
@@ -154,11 +156,13 @@ Output：token序列
 
 作用：解析源程序对应的token序列，生成语法分析结构（语法分析树，Syntax tree）
 
+# Question
+
 Input：单词流  !!Question: 为什么不是token序列？ !!
 
 Output：语法树
 
-检查：输入程序是否符合语法规则
+检查：输入程序是否符合**语法规则**
 
 例如：
 
@@ -171,13 +175,13 @@ Output：语法树
 
 #### (3) 语义分析 (Semantic Analysis)
 
-作用：基于语法结果进一步分析语义  
+作用：基于语法结果进一步分析语义，收集标识符的属性信息（type, scope等）
 
 Input：语法树
 
 Output：语法树+符号表
 
-检查：输入程序是否符合语义规则
+检查：输入程序是否符合**语义规则**
 
 例如：
 
@@ -197,6 +201,8 @@ Output：IR
 生成IR的好处：建立源和目标语言的桥梁，易于翻译过程的实现， 利于实现某些优化算法  
 
 IR的形式：通常为三地址码（TAC）
+
+
 
 对以上例子进行中间代码生成得：
 
@@ -232,6 +238,10 @@ Output：优化后的IR
 - 使用已知量
 - ……  
 
+> [!CAUTION]
+>
+> 这里的代码优化是**机器无关**的
+
 对以上例子进行代码优化得：
 
 ```
@@ -261,7 +271,7 @@ Output：目标代码
 
 - 寄存器分配：放置频繁访问的数据
 - 指令选取：确定机器指令来实现IR操作
-- 与机器有关的优化，例如：寄存器及访存优化
+- 进一步做与**机器有关**的优化，例如：寄存器及访存优化
 
 对以上例子进行目标代码生成得：
 

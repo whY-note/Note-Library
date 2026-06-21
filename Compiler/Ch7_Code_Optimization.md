@@ -1,5 +1,9 @@
 # Chapter 7: Code Optimization 代码优化
 
+[TOC]
+
+
+
 ## 代码优化定义
 
 对代码进行等价变换，使得变换后的代码效率更高（比如：节省运行时间、减少存储空间）
@@ -518,7 +522,7 @@ D(7) = {1,2,4,7}
 
 
 
-#### **活跃变量**数据流分析 (Live Variable Analysis)
+#### 活跃变量数据流分析 (Live Variable Analysis)
 
 符号说明：
 
@@ -652,4 +656,4 @@ j 在定值点d5 的DU链为｛d4, d7｝
 
 > [!NOTE]
 >
-> DU链主要还是通过流图来看，与Def-LiveUse-LiveOut-LiveIn表的关系不大
+> DU链主要还是通过看流图来确定，与Def-LiveUse-LiveOut-LiveIn表的关系不大
