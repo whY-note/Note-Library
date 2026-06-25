@@ -8,18 +8,18 @@
 | Parallel computing    | 并行计算   | a program is one in which multiple tasks **cooperate closely to solve a problem** |
 | Distributed computing | 分布式计算 | a program may need to **cooperate with other programs** to solve a problem |
 
-<img src="Untitled.assets/image-20260420111411194.png" alt="image-20260420111411194" style="zoom:50%;" />
+<img src="Ch1_Overview.assets/image-20260420111411194.png" alt="image-20260420111411194" style="zoom:50%;" />
 
 ## Types of parallel systems
 
 1. Shared memory 共享内存
 2. Distributed memory分布式内存
 
-<img src="Untitled.assets/image-20260419105626853.png" alt="image-20260419105626853" style="zoom: 67%;" />
+<img src="Ch1_Overview.assets/image-20260419105626853.png" alt="image-20260419105626853" style="zoom: 67%;" />
 
 ## Process, thread, multitask
 
-<img src="Untitled.assets/image-20260419134854464.png" alt="image-20260419134854464" style="zoom:50%;" />
+<img src="Ch1_Overview.assets/image-20260419134854464.png" alt="image-20260419134854464" style="zoom:50%;" />
 
 ### Process
 

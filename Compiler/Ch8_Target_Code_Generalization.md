@@ -363,7 +363,7 @@ ADD R1, R1, 4 // q = q+4
 ST q, R1
 
 LD R1, p
-LD R2, y 			// y 前面已经在R2里面了，不用再次load了吧 ？
+LD R2, y 			// y 前面已经在R2里面了，不用再次load了吧 ？OK
 ST 0(R1), R2 	// *p = y 
 
 ADD R1, R1, 4 // p = p+4

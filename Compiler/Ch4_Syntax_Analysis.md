@@ -5,8 +5,15 @@
 - 自顶向下分析
 - 自底向上分析
 
-
 ## 自顶向下分析 Top-Down parsing
+
+### 对文法的要求
+
+自顶向下分析 对文法有以下3个要求：
+
+1. 产生式不能存在**左公因子**，否则无法唯一确定选用哪一个产生式往下推导。
+2. 文法中不能存在**左递归**的产生式，否则会导致对该产生式的无限调用。
+3. 文法不能存在**二义性**，否则推导过程不唯一
 
 ### 改写文法 
 
@@ -43,11 +50,9 @@
 
 ##### Example
 
-![image-20260405163232654](Ch4_Syntax_Analysis.assets/image-20260405163232654.png)
+对于文法G[S]: S→if E then S | if E then S else S | other, E →bool 提取左公因子
 
-------
-
-Answer:
+###### Answer
 
 **提取左公因子**
 $$
@@ -88,7 +93,7 @@ $$
 
 ------
 
-Answer
+###### Answer
 
 对于$E \rightarrow E + T | T$, 引入 $E^\prime$ 消除左递归得： $E \rightarrow TE^\prime, \; E^\prime \rightarrow +T E^\prime| \varepsilon$
 
@@ -108,7 +113,7 @@ $$
 
 ##### 规则
 
-将间接左递归变成直接左递归，然后再用直接左递归的方法消除
+**将间接左递归变成直接左递归**，然后再用直接左递归的方法消除
 
 ##### 具体步骤
 
@@ -120,7 +125,7 @@ $$
 
 ------
 
-Answer1:
+###### Answer1:
 
 **Step1: 将所有非终结符按任一顺序排列**  
 
@@ -136,7 +141,7 @@ R，Q，S
 
 **Step3: 去掉无用产生式**
 
-由于Q，R是不可到达的非终结符，所以删除它们的产生式，即删除(2),(3)
+由于Q，R是**不可到达**的非终结符，所以**删除它们的产生式**，即删除(2),(3)
 
 最终得文法 $G^\prime[S]$
 $$
@@ -146,7 +151,7 @@ $$
 
 ------
 
-Answer2:
+###### Answer2:
 
 **Step1: 将所有非终结符按任一顺序排列**  
 
@@ -174,6 +179,10 @@ R \rightarrow bca R^\prime | ca R^\prime | aR^\prime \\
 R^\prime \rightarrow bcaR^\prime|\varepsilon
 $$
 
+> [!NOTE]
+>
+> 在 **Step1** 中，顺序是**任意**的
+
 #### 消除二义性
 
 ![image-20260405194530410](Ch4_Syntax_Analysis.assets/image-20260405194530410.png)
@@ -188,11 +197,9 @@ $$
 
 ##### Example1
 
-![image-20260405193029262](Ch4_Syntax_Analysis.assets/image-20260405193029262.png)
+<img src="Ch4_Syntax_Analysis.assets/image-20260405193029262.png" alt="image-20260405193029262" style="zoom:50%;" />
 
-------
-
-Answer：
+###### Answer
 
 $A \rightarrow Ac|Sd|\varepsilon$ 中含有 $\varepsilon$, 因此：
 
@@ -206,13 +213,13 @@ S \rightarrow Aa|b|a \\
 A \rightarrow Ac|Sd|c 
 $$
 
-##### Example2
+##### Example2 !
 
 ![image-20260405193807340](Ch4_Syntax_Analysis.assets/image-20260405193807340.png)
 
 ------
 
-Answer：
+###### Answer
 
 $S \rightarrow aSbS|bSaS|\varepsilon$ 中含有 $\varepsilon$, 因此：
 
@@ -231,33 +238,63 @@ $$
 
 ### FIRST集（开始符号集）
 
-文法符号串 $\beta$ 的开始符号集 $FIRST(\beta)$ 是由 $\beta$ 推导出的开头的终结符（**包括 $\varepsilon$**）组成的.
+文法符号串 $\beta$ 的开始符号集 $FIRST(\beta)$ 是由 $\beta$ 推导出的开头的**终结符**（**包括 $\varepsilon$**）组成的.
 
-计算方法
+计算方法:
 
 ![image-20260405203133799](Ch4_Syntax_Analysis.assets/image-20260405203133799.png)
+
+> 简而言之，如果X是终结符，那么FIRST(X)={X}
+>
+> 如果X是非终结符，那么FIRST(X)就等于所有由X能推导出的**首个非终结符的集合**
 
 ##### Example
 
 <img src="Ch4_Syntax_Analysis.assets/image-20260405201841776.png" alt="image-20260405201841776" style="zoom:50%;" />
 
-Answer
+###### Answer
 
 ![image-20260405202159809](Ch4_Syntax_Analysis.assets/image-20260405202159809.png)
 
 ### **FOLLOW**集（后跟符号集）
 
-计算方法
+计算方法：
 
 ![image-20260405203041746](Ch4_Syntax_Analysis.assets/image-20260405203041746.png)
 
+##### Example1!
+
+<img src="Ch4_Syntax_Analysis.assets/image-20260405201841776.png" alt="image-20260405201841776" style="zoom:50%;" />
+
+求出FOLLOW集。
+
+###### Answer
+
+前面已经求出了FIRST集:
+
+- FIRST(S) = {a, b, ε}
+- FIRST(A) = {b, ε}
+- FIRST(B) = {a, ε}
+- FIRST(C) = {a, b, c, ε}
+- FIRST(D) = {a, c}
+
+下面开始求FOLLOW集：
+
+| FOLLOW集 | 初始化 | 第1次迭代 |
+| -------- | ------ | --------- |
+| S        | $      | $         |
+| A        |        | a, $, c   |
+| B        |        | $         |
+| C        |        | $         |
+| D        |        | $         |
 
 
-##### Example
+
+##### Example2!
 
 ![image-20260405203500343](Ch4_Syntax_Analysis.assets/image-20260405203500343.png)
 
-Answer
+###### Answer
 
 ![image-20260405203758181](Ch4_Syntax_Analysis.assets/image-20260405203758181.png)
 
