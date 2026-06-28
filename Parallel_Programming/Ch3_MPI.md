@@ -1,16 +1,18 @@
-# Chapter3:MPI
+# Chapter3: MPI
+
+> **消息传递接口(Message-Passing Interface, MPI)**
+>
+> 针对于**分布式**内存系统，角色主要是进程
+>
+> 使用**消息传递**来对分布式内存系统进行编程，
 
 ![image-20260515101501133](Ch3_MPI.assets/image-20260515101501133.png)
-
-使用**消息传递**来对分布式内存系统进行编程，
-
-消息传递接口(Message-PassingInterface, MPI)
 
 ## 基础使用方法
 
 ### `MPI_Init`
 
-用于告知MPI系统进⾏所有必要的初始化设置
+用于告知MPI系统进⾏所有必要的**初始化设置**
 
 ```c
 int MPI_Init(
@@ -19,13 +21,13 @@ int MPI_Init(
 );
 ```
 
-当不需要`argc_p`和`argv_p`时，可以设置为`NULL`
+当不需要`argc_p`和`argv_p`时，二者均可以设置为`NULL`
 
 
 
 ### `MPI_Finalize`
 
-用于告知MPI系统MPI已经使用完毕，为MPI分配的任何资源都可以释放了。
+用于告知MPI系统MPI已经**使用完毕**，为MPI分配的任何资源都可以释放了。
 
 调用方法`MPI_Finalize();`
 
@@ -33,7 +35,7 @@ int MPI_Init(
 
 ### 通信子`MPI_COMM_WORLD`
 
-> **通信子**是一组可以互相发送信息的进程集合。
+> **通信子**是一组可以互相发送信息的**进程集合**。
 >
 > 这个通信子称为 `MPI_COMM_WORLD`
 

@@ -1,5 +1,13 @@
 # Chapter 7: Code Optimization 代码优化
 
+> **重点**：
+>
+> 1. [划分基本块，画流图](#划分基本块)
+> 2. [3种通用优化技术](#通用技术)
+> 3. [边画DAG边优化](#Example: 用DAG优化代码)
+> 4. [循环优化，要求知道那几种技术](#循环优化技术)
+> 5. 全局优化，不考
+
 [TOC]
 
 
@@ -183,7 +191,7 @@ DAG表示：
 | 1型  | `A := op B`   | (op, B, -, A) | <img src="Ch7_Code_Optimization.assets/image-20260616100243463.png" alt="image-20260616100243463" style="zoom:33%;" /> |
 | 2型  | `A := B op C` | (op, B, C, A) | <img src="Ch7_Code_Optimization.assets/image-20260616095642175.png" alt="image-20260616095642175" style="zoom:33%;" /> |
 
-##### Example
+##### Example: 用DAG优化代码
 
 ![image-20260616102910386](Ch7_Code_Optimization.assets/image-20260616102910386.png)
 
@@ -193,7 +201,7 @@ DAG表示：
 
 <img src="Ch7_Code_Optimization.assets/image-20260616103622797.png" alt="image-20260616103622797" style="zoom:50%;" />
 
-#### 局部优化的Example
+#### Example: 局部优化
 
 ![image-20260616103813769](Ch7_Code_Optimization.assets/image-20260616103813769.png)
 
@@ -201,7 +209,7 @@ DAG表示：
 
 ### 循环优化
 
-#### 优化技术
+#### 循环优化技术
 
 循环优化的技术有：
 

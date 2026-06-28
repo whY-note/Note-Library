@@ -1,5 +1,12 @@
 # Chapter 3: Lexical Analysis 词法分析
 
+> **重点**：
+>
+> 1. [按要求写出正则表达式，或说明一个正则表达式描述了什么](#正则表达式(Regular Expressions))
+> 2. [RE→NFA, 用汤姆森算法构造NFA](#RE→NFA)
+> 3. [NFA→DFA (2种方法：ε闭包构造法、袭击构造法)](#NFA→DFA)
+> 4. [DFA化简](#DFA化简)
+
 [TOC]
 
 词法分析的任务：
@@ -31,7 +38,7 @@
 
 
 
-## 正则表达式（Regular Expressions）
+## 正则表达式(Regular Expressions)
 
 正则表达式又称为**正规式**
 

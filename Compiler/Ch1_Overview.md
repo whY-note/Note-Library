@@ -140,13 +140,25 @@ Input：源程序
 
 Output：token序列
 
+>**token**
+>
+>表示方式：`<类别, 属性值>`
+>
+>类别有：保留字、标示符、常量、运算符……
+
 检查：token是否符合**词法规则**
 
-> **token**
->
-> 表示方式：`<类别, 属性值>`
->
-> 类别有：保留字、标示符、常量、运算符……
+例如：
+
+```cpp
+#include<iostream>
+
+void main() {
+  int 1a; //<- 1a 不符合cpp变量定义的形式（因为`1a`以数字1开头） 
+}
+```
+
+
 
 对以上例子进行词法分析得：
 
@@ -156,9 +168,7 @@ Output：token序列
 
 作用：解析源程序对应的token序列，生成语法分析结构（语法分析树，Syntax tree）
 
-# Question
-
-Input：单词流  !!Question: 为什么不是token序列？ !!
+Input：单词流(token序列)
 
 Output：语法树
 
