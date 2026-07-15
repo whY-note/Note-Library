@@ -34,9 +34,9 @@ $$
 
 #### Method 2: Model-free
 
-> Idea: Flip the coin many times (called "sampling"), and then calculate the average of the outcomes.
+> Idea: Flip the coin many times (called "**sampling**"), and then calculate the average of the outcomes.
 
-Suppose we get a sample sequence: $\{x_1,x_2,\cdots,x_N \}$
+Suppose we take the experiments for $N$ times and get a sample sequence: $\{x_1,x_2,\cdots,x_N \}$
 
 Then, the mean can be approximated as
 $$
@@ -50,7 +50,7 @@ This is ***the idea of Monte Carlo estimation***
 >
 > 当采样次数$N$比较小时，无法保证；
 >
-> 当采样次数$N$非常大时，根据大数定理，蒙特卡洛估计的值与真实值会比较接近
+> 当采样次数$N$非常大时，根据**大数定理**，蒙特卡洛估计的值与真实值会比较接近
 
 > **大数定理 Law of Large Numbers**
 >
@@ -71,14 +71,14 @@ This is ***the idea of Monte Carlo estimation***
 
 ## Convert policy iteration to be Model-free
 
-上一章介绍的 policy iteration algorithm 其实是 Model-based 的算法，现在我们要将它变成 Model-free 的。
+上一章介绍的 policy iteration algorithm 其实是 **Model-based** 的算法，现在我们要将它变成 **Model-free** 的。
 
 Policy iteration 含有两步：
 
 1. Policy evaluation: $\mathbf{v}_{\pi_k}=\mathbf{r}_{\pi_k} + \gamma P_{\pi_k}\mathbf{v}_{\pi_k}$
 2. Policy improvement: $\pi_{k+1}=\arg \max_{\pi} \left( \mathbf{r}_{\pi} + \gamma P_{\pi} \mathbf{v}_{\pi_k} \right)$
 
-Policy improvement的elementwise form是
+Policy improvement 的 elementwise form 是:
 $$
 {\pi_{k+1}}(s)=\arg \max_{\pi} \sum_{a} \pi(a|s) \left[ \sum_r p(r|s,a) r + \gamma \sum_{s'} p(s'|s,a)v_{\pi_k}(s') \right],\quad s \in \mathcal{S}
 $$
@@ -87,6 +87,10 @@ $$
 {\pi_{k+1}}(s)=\arg \max_{\pi} \sum_{a} \pi(a|s) q_{\pi_k}(s,a),\quad s \in \mathcal{S}
 $$
 要将policy iteration algorithm 变成Model-free的，关键就是将动作价值$q_{\pi_k}(s,a)$写成Model-free的。
+
+> [!IMPORTANT]
+>
+> 上述算法之所以是 **Model-based** 的，主要是因为需要已知 $p(r|s,a), p(s'|s,a)$
 
 ### 动作价值$q_{\pi_k}(s,a)$的求法
 
@@ -98,15 +102,15 @@ $$
 $$
 q_{\pi_k}(s,a) = \sum_r p(r|s,a) r + \gamma \sum_{s'} p(s'|s,a)v_{\pi_k}(s')
 $$
-但是如果**模型未知**，可以像[Example：Flip a coin Method 2: Model-free](#Method 2: Model-free)一样，利用蒙特卡洛方法对$\mathbb{E}[G_t|A_t=a,S_t=s]$进行估计，从而得到$q_{\pi_k}(s,a)$的一个近似值，具体如下所示。
+但是如果**模型未知**，可以像[Example：Flip a coin Method 2: Model-free](#Method 2: Model-free)一样，利用蒙特卡洛方法对 $\mathbb{E}[G_t|A_t=a,S_t=s]$ 进行估计，从而得到$q_{\pi_k}(s,a)$的一个近似值，具体如下所示。
 
 #### 蒙特卡洛法估计动作价值$q_{\pi_k}(s,a)$
 
-- Starting from a pair of state and action $(s,a)$, following a policy $\pi_k$, generate an episode.
-- The return of the episode is $g(s,a)$.
--  $g(s,a)$ is a sample of $G_t$ in $\mathbb{E}[G_t|A_t=a,S_t=s]$.
+1. Starting from a pair of state and action $(s,a)$, following a policy $\pi_k$ , generate an episode.
+2. The return of the episode is $g(s,a)$.
+3. $g(s,a)$ is a sample of $G_t$ in $\mathbb{E}[G_t|A_t=a,S_t=s]$.
 
-- Suppose we have a set of episodes and hence $\{g^{(j)}(s,a) \}$. So
+4. Suppose we have a set of episodes and hence $\{g^{(j)}(s,a) \}_{j=1}^{N}$. So
   $$
   q_{\pi_k}(s,a) = \mathbb{E}[G_t|A_t=a,S_t=s] \approx \frac{1}{N} \sum_{j=1}^{N} g^{(j)}(s,a)
   $$
@@ -122,6 +126,10 @@ $$
 ### 算法流程
 
 该算法的具体流程如下：
+
+#### Initialization:  
+
+Given an initial policy $\pi_0$
 
 #### Step 1: Policy evaluation
 
@@ -150,7 +158,7 @@ $$
 
 > [!NOTE]
 >
-> 这个算法与Policy iteration的区别在于Step 1: Policy evaluation，Step 2: Policy Improvement是一样的。
+> 这个算法与Policy iteration的区别在于Step 1: Policy evaluation，而Step 2: Policy Improvement是一样的。
 
 ### 算法分析
 
@@ -292,3 +300,6 @@ $$
 exploring 是指要遍历所有的state-action pair
 
 starts 是指 收集的episodes 一定要从某个state-action pair开始， 而不按照[思考：如何更高效地利用数据？](#思考：如何更高效地利用数据？)那样，收集那些在一个episode中间visit过的episodes
+
+
+

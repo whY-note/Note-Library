@@ -326,6 +326,8 @@ $\alpha \rightarrow \beta$
 
 <img src="Ch2_Grammer.assets/image-20260623095732582.png" alt="image-20260623095732582" style="zoom:50%;" />
 
+#### 辨析: 句型vs句子
+
 |      | 符号串的组成       |
 | ---- | ------------------ |
 | 句型 | 终结符 or 非终结符 |

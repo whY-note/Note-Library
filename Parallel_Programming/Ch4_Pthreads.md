@@ -250,11 +250,11 @@ int sem_post(
 
 #### 忙等待+互斥量
 
-<img src="Untitled.assets/image-20260513133818501.png" alt="image-20260513133818501" style="zoom:50%;" />
+<img src="Ch4_Pthreads.assets/image-20260513133818501.png" alt="image-20260513133818501" style="zoom:50%;" />
 
 #### 信号量
 
-<img src="Untitled.assets/image-20260513133719057.png" alt="image-20260513133719057" style="zoom:60%;" />
+<img src="Ch4_Pthreads.assets/image-20260513133719057.png" alt="image-20260513133719057" style="zoom:60%;" />
 
 #### 条件变量
 
@@ -324,7 +324,7 @@ pthread_mutex_lock(&mutex_p);
 
 利用条件变量实现路障
 
-<img src="Untitled.assets/image-20260513135601971.png" alt="image-20260513135601971" style="zoom:50%;" />
+<img src="Ch4_Pthreads.assets/image-20260513135601971.png" alt="image-20260513135601971" style="zoom:50%;" />
 
 
 

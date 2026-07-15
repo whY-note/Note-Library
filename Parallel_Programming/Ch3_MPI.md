@@ -41,8 +41,12 @@ int MPI_Init(
 
 获取关于 `MPI_COMM_WORLD`的信息，可以利用：
 
-- `MPI_Comm_size`：获取通信子的进程数
+- `MPI_Comm_size`：获取通信子的进程总数
 - `MPI_Comm_rank`：返回正在调用进程在通信子中的进程号
+
+#### `MPI_Comm_size`
+
+作用：获取通信子的进程总数
 
 ```c
 int MPI_Comm_size(
@@ -53,7 +57,9 @@ int MPI_Comm_size(
 
 调用方法：`MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);`获取的进程数在`comm_sz`中
 
+#### `MPI_Comm_rank`
 
+作用：返回正在调用进程在通信子中的进程号
 
 ```c
 int MPI_Comm_rank(
@@ -70,11 +76,11 @@ int MPI_Comm_rank(
 
 ```c
 int MPI_Send(
-		void*				  msg_buf_p /* 指向包含消息内容的内存块的指针 */,
-		int 					msg_size ,
-		MPI_Datatype 	msg_type ,
-		int 					dest			/* 指定了要接受消息的进程的进程号 */,
-		int 					tag				/* 用于区分看上去一样的消息,可以填0，1等非负整型数 */,
+		void*				  msg_buf_p 	 /* 指向包含消息内容的内存块的指针 */,
+		int 					msg_size 		 /* 要发送的数据项个数（不是字节数）*/,
+		MPI_Datatype 	msg_type 		 /* 要发送数据的MPI数据类型，如：MPI_INT，MPI_FLOAT，MPI_CHAR 等 */,
+		int 					dest				 /* 指定了要接受消息的进程的进程号 */,
+		int 					tag					 /* 消息标签。用于区分看上去一样的消息,可以填0，1等非负整型数 */,
 		MPI_Comm			communicator /* 一般就写 MPI_COMM_WORLD */
 );
 ```
@@ -85,19 +91,21 @@ int MPI_Send(
 
 ```c
 int MPI_Recv(
-		void*				  msg_buf_p 	/* 指向包含消息内容的内存块的指针 */,
-		int 					msg_size ,
-		MPI_Datatype 	msg_type ,
-		int 					source			/* 指定了要消息来源的进程的进程号 */,
-		int 					tag					/* 用于区分看上去一样的消息,要与MPI_Send的相对应,可以填0，1等非负整型数 */,
+		void*				  msg_buf_p 	 /* 指向包含消息内容的内存块的指针 */,
+		int 					msg_size 		 /* 最多接收的数据项个数（不是字节数）*/,
+		MPI_Datatype 	msg_type 		 /* 接收数据的MPI数据类型，如：MPI_INT，MPI_FLOAT，MPI_CHAR 等 */,
+		int 					source			 /* 指定了要消息来源的进程的进程号，可以用 MPI_ANY_SOURCE 匹配任意的 */,
+		int 					tag					 /* 消息标签。用于区分看上去一样的消息,要与MPI_Send的相对应,可以填0，1等非负整型数，可以用MPI_ANY_TAG 匹配任意的 */,
 		MPI_Comm			communicator /* 一般就写 MPI_COMM_WORLD */,
-  	MPI_Status* 	status_p		/* 大部分情况下，不需要使用这个参数，赋予MPI常量MPI_STATUS_IGNORE 就行了 */
+  	MPI_Status* 	status_p		 /* 大部分情况下，不需要使用这个参数，赋予MPI常量MPI_STATUS_IGNORE 就行了 */
 );
 ```
 
 `MPI_Recv`的前6个参数与`MPI_Send`的前6个参数是对应的。
 
-特别地，一个进程可以接收多个进程发来的消息，接收进程并不知道消息发送的顺序，这种情况下，可以将`MPI_ANY_SOURCE`传给`MPU_RECV`的`source`参数。类似地，一个进程可能接收多条来自另一个进程的有着不同标签的消息，并且接收进程并不知道消息发送的顺序，这种情况下，MPI提供了特殊的常量`MPI_ANY_TAG`，可以传给`MPI_Recv` 的`tag`参数。
+特别地，一个进程可以接收多个进程发来的消息，接收进程并不知道消息发送的顺序，这种情况下，可以将`MPI_ANY_SOURCE`传给`MPU_RECV`的`source`参数。
+
+类似地，一个进程可能接收多条来自另一个进程的有着不同标签的消息，并且接收进程并不知道消息发送的顺序，这种情况下，MPI提供了特殊的常量`MPI_ANY_TAG`，可以传给`MPI_Recv` 的`tag`参数。
 
 > [!CAUTION]
 >
